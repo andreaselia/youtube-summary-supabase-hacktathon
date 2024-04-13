@@ -1,5 +1,6 @@
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
+import { Form } from "@remix-run/react";
 
 import { createSupabaseServerClient } from "~/supabase.server";
 
@@ -28,6 +29,9 @@ export default function Dashboard() {
       <h1 className="text-3xl font-bold underline">
         Dashboard
       </h1>
+      <Form action="/sign-out" method="post">
+        <button type="submit">Sign Out</button>
+      </Form>
     </div>
   );
 }
