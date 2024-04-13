@@ -34,7 +34,12 @@ export async function action({ request }: ActionFunctionArgs) {
 
   console.log("video_url", formData.get("video_url"));
 
+  const {
+    data: { session },
+  } = await supabaseClient.auth.getSession();
+
   const { error } = await supabaseClient.from("videos").insert({
+    user_id: session?.user?.id,
     video_url: formData.get("video_url") as string,
   });
 
