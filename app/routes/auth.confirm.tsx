@@ -2,6 +2,7 @@ import { redirect, type LoaderFunctionArgs } from '@remix-run/node'
 import { createServerClient, parse, serialize } from '@supabase/ssr'
 import { type EmailOtpType } from '@supabase/supabase-js'
 
+// http://localhost:5173/auth/confirm?token_hash=9b3293ca-6f04-4966-a86f-740eba96cc2c&type=magiclink
 export async function loader({ request }: LoaderFunctionArgs) {
   const requestUrl = new URL(request.url)
   const token_hash = requestUrl.searchParams.get('token_hash')
