@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 
 import { createSupabaseServerClient } from "~/supabase.server";
@@ -11,9 +11,17 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function action({
-  request,
-}: ActionFunctionArgs) {
+export const loader = async ({ request }: ActionFunctionArgs) => {
+  const { supabaseClient } = createSupabaseServerClient(request);
+
+  const user = await supabaseClient.auth.getUser();
+
+  if (user) {
+    return redirect("/dashboard");
+  }
+};
+
+export async function action({ request }: ActionFunctionArgs) {
   const { supabaseClient, headers } = createSupabaseServerClient(request);
 
   const formData = await request.formData();
