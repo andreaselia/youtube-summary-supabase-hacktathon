@@ -12,13 +12,19 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async ({ request }: ActionFunctionArgs) => {
-  const { supabaseClient } = createSupabaseServerClient(request);
+  const { supabaseClient, headers } = createSupabaseServerClient(request);
 
-  const user = await supabaseClient.auth.getUser();
+  const {
+    data: { session },
+  } = await supabaseClient.auth.getSession();
 
-  if (user) {
-    return redirect("/dashboard");
+  if (session?.user) {
+    return redirect("/dashboard", {
+      headers,
+    });
   }
+
+  return null;
 };
 
 export async function action({ request }: ActionFunctionArgs) {
