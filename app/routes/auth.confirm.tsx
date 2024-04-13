@@ -1,42 +1,29 @@
-import { redirect, type LoaderFunctionArgs } from '@remix-run/node'
-import { createServerClient, parse, serialize } from '@supabase/ssr'
-import { type EmailOtpType } from '@supabase/supabase-js'
+import { ActionFunctionArgs, redirect } from "@remix-run/node";
 
-// http://localhost:5173/auth/confirm?token_hash=9b3293ca-6f04-4966-a86f-740eba96cc2c&type=magiclink
-export async function loader({ request }: LoaderFunctionArgs) {
-  const requestUrl = new URL(request.url)
-  const token_hash = requestUrl.searchParams.get('token_hash')
-  const type = requestUrl.searchParams.get('type') as EmailOtpType | null
-  const next = requestUrl.searchParams.get('next') || '/'
-  const headers = new Headers()
+import { createSupabaseServerClient } from "~/supabase.server";
 
-  if (token_hash && type) {
-    const cookies = parse(request.headers.get('Cookie') ?? '')
+export const loader = async ({ request }: ActionFunctionArgs) => {
+  const url = new URL(request.url);
+  const code = url.searchParams.get("code");
 
-    const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
-      cookies: {
-        get(key) {
-          return cookies[key]
-        },
-        set(key, value, options) {
-          headers.append('Set-Cookie', serialize(key, value, options))
-        },
-        remove(key, options) {
-          headers.append('Set-Cookie', serialize(key, '', options))
-        },
-      },
-    })
+  console.log("code", code);
 
-    const { error } = await supabase.auth.verifyOtp({
-      type,
-      token_hash,
-    })
+  if (code) {
+    const { supabaseClient, headers } = createSupabaseServerClient(request);
+    const { error } = await supabaseClient.auth.exchangeCodeForSession(code);
 
-    if (!error) {
-      return redirect(next, { headers })
+    console.log("error", error);
+
+    if (error) {
+      return redirect("/sign-in");
     }
+
+    return redirect("/dashboard", {
+      headers,
+    });
   }
 
-  // return the user to an error page with instructions
-  return redirect('/auth/auth-code-error', { headers })
-}
+  return new Response("Authentication failed", {
+    status: 400,
+  });
+};
