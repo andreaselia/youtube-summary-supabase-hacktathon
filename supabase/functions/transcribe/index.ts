@@ -3,18 +3,22 @@
 // This enables autocomplete, go to definition, etc.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import OpenAI from 'https://deno.land/x/openai@v4.24.0/mod.ts'
 
 import { fetchCaptions } from "../_lib/fetch-captions.ts"
 
 console.log("Hello from Functions!")
 
 Deno.serve(async (req) => {
-  // const authHeader = req.headers.get('Authorization')!
   const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    // { global: { headers: { Authorization: authHeader } } }
+    Deno.env.get('MY_SUPABASE_URL') ?? '',
+    Deno.env.get('MY_SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    // { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
   )
+
+  const openai = new OpenAI({
+    apiKey: Deno.env.get('OPENAI_API_KEY')!,
+  })
 
   const { video } = await req.json()
 
@@ -29,24 +33,34 @@ Deno.serve(async (req) => {
 
   const captions = await fetchCaptions()
 
+  const chatCompletion = await openai.chat.completions.create({
+    messages: [{
+      role: 'user',
+      content: `
+        Write a short summary of the video captions below.
+        Include a section for the summary, key takeaways, highlights and keywords.
+        Ignore any intro and outro in the video that may not be relevant.
+        Captions: ${captions.subtitles}`,
+    }],
+    model: 'gpt-3.5-turbo',
+    stream: false,
+  })
+
+  const reply = chatCompletion.choices[0].message.content
+
   console.log("Captions found")
 
   const { error } = await supabaseClient
     .from("videos")
     .update({
-      captions,
+      captions: reply,
     })
     .eq("id", video.id)
 
   if (error) {
-    console.error("Error updating video", error)
+    console.error("Failed to update video:", error)
 
-    return new Response(
-      JSON.stringify({
-        success: false,
-      }),
-      { headers: { "Content-Type": "application/json" } },
-    )
+    console.log(error.message)
   }
 
   return new Response(
