@@ -26,7 +26,10 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     .single();
 
   if (error) {
-    return json({}, { headers });
+    throw new Response(null, {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
 
   return json(video, { headers });
@@ -40,8 +43,9 @@ export default function Dashboard() {
   return (
     <div>
       <h1 className="text-3xl font-bold underline">
-        Video: {loaderResponse.id}
+        {loaderResponse.title}
       </h1>
+      <p>{loaderResponse.description}</p>
       <div className="mx-auto max-w-sm">
         {loaderResponse.summary}
       </div>
