@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
+import { Form, useActionData, useLoaderData } from "@remix-run/react";
 
 import { createSupabaseServerClient } from "~/supabase.server";
 
@@ -22,7 +22,13 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     return redirect("/sign-in");
   }
 
-  return null;
+  const { data: videos, error } = await supabaseClient.from("videos").select("*");
+
+  if (error) {
+    return json([], { headers });
+  }
+
+  return json(videos, { headers });
 };
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -52,8 +58,11 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function Dashboard() {
   const actionResponse = useActionData<typeof action>();
+  // TODO: add video type
+  const videos: any[] = useLoaderData();
 
   console.log("actionResponse", actionResponse);
+  console.log("videos", videos);
 
   return (
     <div>
@@ -82,6 +91,15 @@ export default function Dashboard() {
       ) : (
         <h3>We are summarizing the video. Please wait...</h3>
       )}
+      <div>
+        {videos.map((video) => (
+          <div key={video.id}>
+            <a href={`/videos/${video.id}`}>
+              {video.video_url}
+            </a>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
