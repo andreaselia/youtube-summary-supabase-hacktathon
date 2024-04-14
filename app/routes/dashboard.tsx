@@ -19,9 +19,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   } = await supabaseClient.auth.getSession();
 
   if (!session?.user) {
-    return redirect("/sign-in", {
-      headers,
-    });
+    return redirect("/sign-in");
   }
 
   return null;
