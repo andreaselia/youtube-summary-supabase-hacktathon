@@ -7,8 +7,6 @@ import { Form, useActionData } from "@remix-run/react";
 import { createSupabaseServerClient } from "~/supabase.server";
 
 type Subtitle = {
-  startTime: string;
-  durationTime: string;
   text: string;
 };
 
@@ -72,25 +70,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const subtitlesResponse = await fetch(subtitle.baseUrl);
   const transcriptData = await subtitlesResponse.text();
 
-  const startTimeRegex = /start="([\d.]+)"/;
-  const durationTimeRegex = /dur="([\d.]+)"/;
-
   const lines = transcriptData
     .replace('<?xml version="1.0" encoding="utf-8" ?><transcript>', "")
     .replace("</transcript>", "")
     .split("</text>")
     .filter((line: string) => line && line.trim())
     .reduce((acc: Subtitle[], line: string) => {
-      const startTimeResult = startTimeRegex.exec(line);
-      const durationTimeResult = durationTimeRegex.exec(line);
-
-      if (!startTimeResult || !durationTimeResult) {
-        console.warn(`Could not extract start time or duration time for line ${line}`);
-        return acc;
-      }
-
-      const [, startTime] = startTimeResult;
-      const [, durationTime] = durationTimeResult;
 
       const htmlText = line
         .replace(/<text.+>/, "")
@@ -100,18 +85,18 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       const text = striptags(decodedText);
 
       acc.push({
-        startTime,
-        durationTime,
         text,
       });
 
       return acc;
     }, []);
 
+  const joinedLines = lines.map((line: Subtitle) => line.text).join(" ");
+
   return json({
     title,
     description,
-    subtitles: lines,
+    subtitles: joinedLines,
   }, {
     headers,
   });
