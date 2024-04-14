@@ -28,7 +28,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const authUrl = client.generateAuthUrl({
     access_type: 'offline',
-    scope: 'https://www.googleapis.com/auth/cloud-platform',
+    scope: [
+      'https://www.googleapis.com/auth/cloud-platform',
+      'https://www.googleapis.com/auth/youtube.force-ssl',
+    ],
     include_granted_scopes: true,
   });
 

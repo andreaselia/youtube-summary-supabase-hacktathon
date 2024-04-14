@@ -41,7 +41,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       status: 400,
       headers,
     });
-    // return redirect("/");
   }
 
   const token = await client.getToken(code);
