@@ -1,10 +1,5 @@
-import he from "he";
-import striptags from "striptags";
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
-
-import { createSupabaseServerClient } from "~/supabase.server";
+import he from "npm:he";
+import striptags from "npm:striptags";
 
 type Subtitle = {
   text: string;
@@ -15,24 +10,13 @@ type CaptionTrack = {
   vssId: string;
 };
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const { supabaseClient, headers } = createSupabaseServerClient(request);
-
-  const { data: { user } } = await supabaseClient.auth.getUser();
-
-  if (!user) {
-    return redirect("/");
-  }
-
+export const fetchCaptions = async () => {
   const videoId = "qA65QjWCl60";
-
   const videoResponse = await fetch(`https://youtube.com/watch?v=${videoId}`);
   const videoData = await videoResponse.text();
 
   if (!videoData.includes("captionTracks")) {
-    return json(`Could not find captions for video ${videoId}`, {
-      headers,
-    });
+    return { error: `Could not find captions for video ${videoId}` };
   }
 
   const titleMatch = videoData.match(/<meta name="title" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
@@ -45,9 +29,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const regexResult = regex.exec(videoData);
 
   if (!regexResult) {
-    return json(`Could not extract captionTracks for video ${videoId}`, {
-      headers,
-    });
+    return { error: `Could not extract captionTracks for video ${videoId}` };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -62,16 +44,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     captionTracks.find((track: CaptionTrack) => track.vssId && track.vssId.match(`.${lang}`));
 
   if (!subtitle?.baseUrl) {
-    return json(`Could not find en lang for video ${videoId}`, {
-      headers,
-    });
+    return { error: `Could not find en lang for video ${videoId}` };
   }
 
   const subtitlesResponse = await fetch(subtitle.baseUrl);
   const transcriptData = await subtitlesResponse.text();
 
   const lines = transcriptData
-    .replace('<?xml version="1.0" encoding="utf-8" ?><transcript>', "")
+    .replace("<?xml version=\"1.0\" encoding=\"utf-8\" ?><transcript>", "")
     .replace("</transcript>", "")
     .split("</text>")
     .filter((line: string) => line && line.trim())
@@ -93,34 +73,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const joinedLines = lines.map((line: Subtitle) => line.text).join(" ");
 
-  return json({
+  return {
     title,
     description,
     subtitles: joinedLines,
-  }, {
-    headers,
-  });
+  };
 };
-
-export default function Captions() {
-  const actionResponse = useActionData<typeof action>();
-
-  return (
-    <div>
-      <h1 className="text-3xl font-bold underline">
-        Captions
-      </h1>
-      <Form method="post">
-        <button
-          type="submit"
-          className="bg-sky-500 hover:bg-sky-700 px-5 py-2.5 text-sm leading-5 rounded-md font-semibold text-white"
-        >
-          Get Captions
-        </button>
-      </Form>
-      <div>
-        {JSON.stringify(actionResponse, null, 2)}
-      </div>
-    </div>
-  );
-}

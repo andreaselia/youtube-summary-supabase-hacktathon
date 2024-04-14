@@ -2,30 +2,56 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+import { fetchCaptions } from "../_lib/fetch-captions.ts"
+
 console.log("Hello from Functions!")
 
 Deno.serve(async (req) => {
+  // const authHeader = req.headers.get('Authorization')!
+  const supabaseClient = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    // { global: { headers: { Authorization: authHeader } } }
+  )
+
   const { video } = await req.json()
 
   console.log(`Transcribing video ${video.id}...`)
 
   // eslint-disable-next-line no-useless-escape
-  const regexp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/gi;
-  const match = regexp.exec(video.video_url);
-  const videoId = match[1]; // e.g. "dQw4w9WgXcQ"
+  const regexp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/gi
+  const match = regexp.exec(video.video_url)
+  const videoId = match[1] // e.g. "dQw4w9WgXcQ"
 
-  console.log(`Video ID: ${videoId}`);
+  console.log("Fetching captions for video:", videoId)
 
-  // TODO: fetch caption ids from /captions endpoint?
-  // https://www.googleapis.com/youtube/v3/captions?videoId=VIDEO_ID&key=API_KEY
+  const captions = await fetchCaptions()
 
-  // TODO: fetch captions from /captions/:id endpoint?
+  console.log("Captions found")
 
-  // TODO: verify the endpoints above, can't remember what they are exactly at the moment
+  const { error } = await supabaseClient
+    .from("videos")
+    .update({
+      captions,
+    })
+    .eq("id", video.id)
+
+  if (error) {
+    console.error("Error updating video", error)
+
+    return new Response(
+      JSON.stringify({
+        success: false,
+      }),
+      { headers: { "Content-Type": "application/json" } },
+    )
+  }
 
   return new Response(
     JSON.stringify({
-      message: `Hello video ${video.id}!`,
+      success: true,
     }),
     { headers: { "Content-Type": "application/json" } },
   )
