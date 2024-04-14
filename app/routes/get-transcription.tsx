@@ -13,6 +13,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   // TODO: get the transcription from the video_url via the YouTube captions API
+  console.log("get transcription");
 
   return redirect("/", {
     headers,

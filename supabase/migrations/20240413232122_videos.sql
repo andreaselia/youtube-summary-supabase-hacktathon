@@ -9,18 +9,24 @@ create table videos (
 alter table videos enable row level security;
 
 create policy "Individuals can create videos." on videos for
-    insert with check (auth.uid() = user_id);
+  insert with check (auth.uid() = user_id);
 create policy "Individuals can view their own videos. " on videos for
-    select using (auth.uid() = user_id);
+  select using (auth.uid() = user_id);
 create policy "Individuals can update their own videos." on videos for
-    update using (auth.uid() = user_id);
+  update using (auth.uid() = user_id);
 create policy "Individuals can delete their own videos." on videos for
-    delete using (auth.uid() = user_id);
+  delete using (auth.uid() = user_id);
 
 create function public.handle_new_video()
 returns trigger as $$
 begin
-    -- send pgnet request to /get-transcriptions
+  perform "net"."http_post"(
+    'http://172.17.0.1:54321/get-transcription'::text,
+    jsonb_build_object(
+      'video', to_jsonb(new.*)
+    ),
+    headers:='{"Content-Type": "application/json"}'::jsonb
+  ) as request_id;
 
   return new;
 end;
