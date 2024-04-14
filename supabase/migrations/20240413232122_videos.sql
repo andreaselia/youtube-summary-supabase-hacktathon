@@ -21,7 +21,7 @@ create function public.handle_new_video()
 returns trigger as $$
 begin
   perform "net"."http_post"(
-    'http://172.17.0.1:54321/get-transcription'::text,
+    'http://172.17.0.1:54321/functions/v1/transcribe'::text,
     jsonb_build_object(
       'video', to_jsonb(new.*)
     ),
