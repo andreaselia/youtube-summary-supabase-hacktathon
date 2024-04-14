@@ -16,3 +16,16 @@ create policy "Individuals can update their own videos." on videos for
     update using (auth.uid() = user_id);
 create policy "Individuals can delete their own videos." on videos for
     delete using (auth.uid() = user_id);
+
+create function public.handle_new_video()
+returns trigger as $$
+begin
+    -- send pgnet request to /get-transcriptions
+
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_video_created
+  after insert on videos
+  for each row execute procedure public.handle_new_video();
