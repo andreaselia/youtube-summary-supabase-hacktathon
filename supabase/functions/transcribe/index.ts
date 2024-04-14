@@ -9,6 +9,12 @@ Deno.serve(async (req) => {
 
   console.log(`Transcribing video ${video.id}...`)
 
+  // TODO: fetch caption ids from /captions endpoint?
+
+  // TODO: fetch captions from /captions/:id endpoint?
+
+  // TODO: verify the endpoints above, can't remember what they are exactly at the moment
+
   return new Response(
     JSON.stringify({
       message: `Hello video ${video.id}!`,
