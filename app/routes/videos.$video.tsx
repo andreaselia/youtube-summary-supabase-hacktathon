@@ -43,7 +43,7 @@ export default function Dashboard() {
         Video: {loaderResponse.id}
       </h1>
       <div className="mx-auto max-w-sm">
-        {loaderResponse.captions}
+        {loaderResponse.summary}
       </div>
     </div>
   );

@@ -40,20 +40,23 @@ Deno.serve(async (req) => {
         Write a short summary of the video captions below.
         Include a section for the summary, key takeaways, highlights and keywords.
         Ignore any intro and outro in the video that may not be relevant.
+        Return the summary in markdown format.
         Captions: ${captions.subtitles}`,
     }],
     model: 'gpt-3.5-turbo',
     stream: false,
   })
 
-  const reply = chatCompletion.choices[0].message.content
+  const subtitlesSummary = chatCompletion.choices[0].message.content
 
   console.log("Captions found")
 
   const { error } = await supabaseClient
     .from("videos")
     .update({
-      captions: reply,
+      title: captions.title,
+      description: captions.description,
+      summary: subtitlesSummary,
     })
     .eq("id", video.id)
 
