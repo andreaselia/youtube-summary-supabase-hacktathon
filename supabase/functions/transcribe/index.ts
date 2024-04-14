@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
 
   console.log("Fetching captions for video:", videoId)
 
-  const captions = await fetchCaptions()
+  const captions = await fetchCaptions(videoId)
 
   const chatCompletion = await openai.chat.completions.create({
     messages: [{

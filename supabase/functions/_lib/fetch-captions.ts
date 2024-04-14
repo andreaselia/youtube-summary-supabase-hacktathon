@@ -10,8 +10,8 @@ type CaptionTrack = {
   vssId: string;
 };
 
-export const fetchCaptions = async () => {
-  const videoId = "qA65QjWCl60";
+export const fetchCaptions = async (videoId: string) => {
+  // const videoId = "qA65QjWCl60"; // For testing
   const videoResponse = await fetch(`https://youtube.com/watch?v=${videoId}`);
   const videoData = await videoResponse.text();
 
