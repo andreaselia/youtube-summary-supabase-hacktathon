@@ -9,6 +9,7 @@ Deno.serve(async (req) => {
 
   console.log(`Transcribing video ${video.id}...`)
 
+  // eslint-disable-next-line no-useless-escape
   const regexp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/gi;
   const match = regexp.exec(video.video_url);
   const videoId = match[1]; // e.g. "dQw4w9WgXcQ"

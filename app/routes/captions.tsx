@@ -1,30 +1,21 @@
+import he from "he";
+import striptags from "striptags";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 
 import { createSupabaseServerClient } from "~/supabase.server";
 
-interface Subtitle {
-  start: string;
-  dur: string;
+type Subtitle = {
+  startTime: string;
+  durationTime: string;
   text: string;
-}
+};
 
-interface CaptionTrack {
+type CaptionTrack = {
   baseUrl: string;
   vssId: string;
-}
-
-interface Options {
-  videoID: string;
-  lang?: string;
-}
-
-interface VideoDetails {
-  title: string;
-  description: string;
-  subtitles: Subtitle[];
-}
+};
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabaseClient, headers } = createSupabaseServerClient(request);
@@ -37,23 +28,23 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const videoId = "qA65QjWCl60";
 
-  const response = await fetch(`https://youtube.com/watch?v=${videoId}`);
-  const data = await response.text();
+  const videoResponse = await fetch(`https://youtube.com/watch?v=${videoId}`);
+  const videoData = await videoResponse.text();
 
-  if (!data.includes("captionTracks")) {
+  if (!videoData.includes("captionTracks")) {
     return json(`Could not find captions for video ${videoId}`, {
       headers,
     });
   }
 
-  const titleMatch = data.match(/<meta name="title" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
-  const descriptionMatch = data.match(/<meta name="description" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
+  const titleMatch = videoData.match(/<meta name="title" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
+  const descriptionMatch = videoData.match(/<meta name="description" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
 
   const title = titleMatch ? titleMatch[1] : "No title found";
   const description = descriptionMatch ? descriptionMatch[1] : "No description found";
 
   const regex = /"captionTracks":(\[.*?\])/;
-  const regexResult = regex.exec(data);
+  const regexResult = regex.exec(videoData);
 
   if (!regexResult) {
     return json(`Could not extract captionTracks for video ${videoId}`, {
@@ -61,32 +52,67 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, captionTracksJson] = regexResult;
   const captionTracks = JSON.parse(captionTracksJson);
+
+  const lang = "en";
 
   const subtitle =
     captionTracks.find((track: CaptionTrack) => track.vssId === `.${lang}`) ||
     captionTracks.find((track: CaptionTrack) => track.vssId === `a.${lang}`) ||
-    captionTracks.find(
-      (track: CaptionTrack) => track.vssId && track.vssId.match(`.${lang}`)
-    );
+    captionTracks.find((track: CaptionTrack) => track.vssId && track.vssId.match(`.${lang}`));
 
-      // console.log("result", regexMatch);
-  // const captions = "test";
+  if (!subtitle?.baseUrl) {
+    return json(`Could not find en lang for video ${videoId}`, {
+      headers,
+    });
+  }
 
-  // const data = await fetch(`https://www.googleapis.com/youtube/v3/captions?part=snippet&videoId=9bZkp7q19f0&key=${GOOGLE_API_KEY}`)
-  // const data = await fetch(`https://www.googleapis.com/youtube/v3/captions?part=snippet&videoId=9bZkp7q19f0&id=AUieDaaWOv5QldE1qYQ0Oop_vAq4COlampNKYULwQfX4oV_VU3k&key=${GOOGLE_API_KEY}`)
-  // const data = await fetch(`https://www.googleapis.com/youtube/v3/captions/id?id=AUieDaaWOv5QldE1qYQ0Oop_vAq4COlampNKYULwQfX4oV_VU3k`, {
-  //   headers: {
-  //     Authorization: `Bearer ${accessToken}`,
-  //   },
-  // })
-  //   .then(response => response.json());
+  const subtitlesResponse = await fetch(subtitle.baseUrl);
+  const transcriptData = await subtitlesResponse.text();
 
-  // console.log("data", data);
-  // console.log("data", data.items[0].snippet);
+  const startTimeRegex = /start="([\d.]+)"/;
+  const durationTimeRegex = /dur="([\d.]+)"/;
 
-  return json(captionTracks, {
+  const lines = transcriptData
+    .replace('<?xml version="1.0" encoding="utf-8" ?><transcript>', "")
+    .replace("</transcript>", "")
+    .split("</text>")
+    .filter((line: string) => line && line.trim())
+    .reduce((acc: Subtitle[], line: string) => {
+      const startTimeResult = startTimeRegex.exec(line);
+      const durationTimeResult = durationTimeRegex.exec(line);
+
+      if (!startTimeResult || !durationTimeResult) {
+        console.warn(`Could not extract start time or duration time for line ${line}`);
+        return acc;
+      }
+
+      const [, startTime] = startTimeResult;
+      const [, durationTime] = durationTimeResult;
+
+      const htmlText = line
+        .replace(/<text.+>/, "")
+        .replace(/&amp;/gi, "&")
+        .replace(/<\/?[^>]+(>|$)/g, "");
+      const decodedText = he.decode(htmlText);
+      const text = striptags(decodedText);
+
+      acc.push({
+        startTime,
+        durationTime,
+        text,
+      });
+
+      return acc;
+    }, []);
+
+  return json({
+    title,
+    description,
+    subtitles: lines,
+  }, {
     headers,
   });
 };
