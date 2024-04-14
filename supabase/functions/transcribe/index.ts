@@ -9,7 +9,14 @@ Deno.serve(async (req) => {
 
   console.log(`Transcribing video ${video.id}...`)
 
+  const regexp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/gi;
+  const match = regexp.exec(video.video_url);
+  const videoId = match[1]; // e.g. "dQw4w9WgXcQ"
+
+  console.log(`Video ID: ${videoId}`);
+
   // TODO: fetch caption ids from /captions endpoint?
+  // https://www.googleapis.com/youtube/v3/captions?videoId=VIDEO_ID&key=API_KEY
 
   // TODO: fetch captions from /captions/:id endpoint?
 

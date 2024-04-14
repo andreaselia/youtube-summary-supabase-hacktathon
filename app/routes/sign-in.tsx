@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 
@@ -11,7 +11,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { supabaseClient, headers } = createSupabaseServerClient(request);
 
   const { data: { user } } = await supabaseClient.auth.getUser();
