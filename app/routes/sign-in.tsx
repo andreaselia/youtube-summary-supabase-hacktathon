@@ -14,17 +14,15 @@ export const meta: MetaFunction = () => {
 export const loader = async ({ request }: ActionFunctionArgs) => {
   const { supabaseClient, headers } = createSupabaseServerClient(request);
 
-  const {
-    data: { session },
-  } = await supabaseClient.auth.getSession();
+  const { data: { user } } = await supabaseClient.auth.getUser();
 
-  if (session?.user) {
-    return redirect("/dashboard", {
-      headers,
-    });
+  if (!user) {
+    return null;
   }
 
-  return null;
+  return redirect("/dashboard", {
+    headers,
+  });
 };
 
 export async function action({ request }: ActionFunctionArgs) {

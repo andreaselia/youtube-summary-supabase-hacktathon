@@ -1,8 +1,15 @@
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import { useEffect, useRef } from "react";
 
 import { createSupabaseServerClient } from "~/supabase.server";
+
+type Video = {
+  id: string;
+  user_id: string;
+  video_url: string;
+};
 
 export const meta: MetaFunction = () => {
   return [
@@ -14,11 +21,9 @@ export const meta: MetaFunction = () => {
 export const loader = async ({ request }: ActionFunctionArgs) => {
   const { supabaseClient, headers } = createSupabaseServerClient(request);
 
-  const {
-    data: { session },
-  } = await supabaseClient.auth.getSession();
+  const { data: { user } } = await supabaseClient.auth.getUser();
 
-  if (!session?.user) {
+  if (!user) {
     return redirect("/sign-in");
   }
 
@@ -38,12 +43,10 @@ export async function action({ request }: ActionFunctionArgs) {
 
   console.log("video_url", formData.get("video_url"));
 
-  const {
-    data: { session },
-  } = await supabaseClient.auth.getSession();
+  const { data: { user } } = await supabaseClient.auth.getUser()
 
   const { error } = await supabaseClient.from("videos").insert({
-    user_id: session?.user?.id,
+    user_id: user?.id,
     video_url: formData.get("video_url") as string,
   });
 
@@ -58,11 +61,16 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function Dashboard() {
   const actionResponse = useActionData<typeof action>();
-  // TODO: add video type
-  const videos: any[] = useLoaderData();
+  const formRef = useRef<HTMLFormElement>(null);
+  const videos: Video[] = useLoaderData();
 
   console.log("actionResponse", actionResponse);
-  console.log("videos", videos);
+
+  useEffect(() => {
+    if (actionResponse?.success) {
+      formRef.current?.reset();
+    }
+  }, [actionResponse]);
 
   return (
     <div>
@@ -72,25 +80,21 @@ export default function Dashboard() {
       <Form action="/sign-out" method="post">
         <button type="submit">Sign Out</button>
       </Form>
-      {!actionResponse?.success ? (
-        <Form method="post">
-          <input
-            name="video_url"
-            type="video_url"
-            placeholder="YouTube video URL"
-            required
-            className="px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1 invalid:border-pink-500 invalid:text-pink-600 focus:invalid:border-pink-500 focus:invalid:ring-pink-500 disabled:shadow-none"
-          />
-          <button
-            type="submit"
-            className="bg-sky-500 hover:bg-sky-700 px-5 py-2.5 text-sm leading-5 rounded-md font-semibold text-white"
-          >
-            Summarize
-          </button>
-        </Form>
-      ) : (
-        <h3>We are summarizing the video. Please wait...</h3>
-      )}
+      <Form ref={formRef} method="post">
+        <input
+          name="video_url"
+          type="video_url"
+          placeholder="YouTube video URL"
+          required
+          className="px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1 invalid:border-pink-500 invalid:text-pink-600 focus:invalid:border-pink-500 focus:invalid:ring-pink-500 disabled:shadow-none"
+        />
+        <button
+          type="submit"
+          className="bg-sky-500 hover:bg-sky-700 px-5 py-2.5 text-sm leading-5 rounded-md font-semibold text-white"
+        >
+          Summarize
+        </button>
+      </Form>
       <div>
         {videos.map((video) => (
           <div key={video.id}>

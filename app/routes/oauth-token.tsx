@@ -6,11 +6,9 @@ import { createSupabaseServerClient } from "~/supabase.server";
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabaseClient, headers } = createSupabaseServerClient(request);
 
-  const {
-    data: { session },
-  } = await supabaseClient.auth.getSession();
+  const { data: { user } } = await supabaseClient.auth.getUser();
 
-  if (!session?.user) {
+  if (!user) {
     return redirect("/");
   }
 
