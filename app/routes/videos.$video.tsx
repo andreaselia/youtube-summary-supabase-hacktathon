@@ -2,6 +2,9 @@ import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
+import { parseMarkdown } from "~/markdown.server";
+import { Markdown } from "~/components/markdown";
+
 import { createSupabaseServerClient } from "~/supabase.server";
 
 export const meta: MetaFunction = () => {
@@ -32,7 +35,11 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     });
   }
 
-  return json(video, { headers });
+  return json({
+    title: video.title,
+    description: video.description,
+    summary: parseMarkdown(video.summary),
+  }, { headers });
 };
 
 export default function Dashboard() {
@@ -47,7 +54,7 @@ export default function Dashboard() {
       </h1>
       <p>{loaderResponse.description}</p>
       <div className="mx-auto max-w-sm">
-        {loaderResponse.summary}
+        <Markdown content={loaderResponse.summary} />
       </div>
     </div>
   );
