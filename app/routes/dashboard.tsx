@@ -101,6 +101,10 @@ export default function Dashboard() {
             <a href={`/videos/${video.id}`}>
               {video.video_url}
             </a>
+            <Form action="/delete-video" method="post">
+              <input type="hidden" name="video_id" value={video.id} />
+              <button type="submit">X</button>
+            </Form>
           </div>
         ))}
       </div>
