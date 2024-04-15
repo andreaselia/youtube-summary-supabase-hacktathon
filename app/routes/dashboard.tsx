@@ -9,6 +9,10 @@ type Video = {
   id: string;
   user_id: string;
   video_url: string;
+  title: string;
+  description: string;
+  summary: string;
+  is_complete: boolean;
 };
 
 export const meta: MetaFunction = () => {
@@ -87,6 +91,7 @@ export default function Dashboard() {
           </button>
         </Form>
       </div>
+
       <div className="mt-8 mx-auto w-full max-w-sm">
         <Form ref={formRef} method="post" className="flex items-center space-x-2">
           <input
@@ -103,25 +108,51 @@ export default function Dashboard() {
             Summarize
           </button>
         </Form>
+
         <div className="mt-4 space-y-2">
-          {videos.map((video) => (
-            <div
-              key={video.id}
-              className="px-3 py-1.5 flex items-center justify-between rounded-lg odd:bg-gray-100"
-            >
-              <a href={`/videos/${video.id}`} className="text-sm">
-                {video.video_url}
-              </a>
-              <Form action="/delete-video" method="post">
-                <input type="hidden" name="video_id" value={video.id} />
-                <button type="submit" aria-label="Delete video">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4">
-                    <path fillRule="evenodd" d="M5 3.25V4H2.75a.75.75 0 0 0 0 1.5h.3l.815 8.15A1.5 1.5 0 0 0 5.357 15h5.285a1.5 1.5 0 0 0 1.493-1.35l.815-8.15h.3a.75.75 0 0 0 0-1.5H11v-.75A2.25 2.25 0 0 0 8.75 1h-1.5A2.25 2.25 0 0 0 5 3.25Zm2.25-.75a.75.75 0 0 0-.75.75V4h3v-.75a.75.75 0 0 0-.75-.75h-1.5ZM6.05 6a.75.75 0 0 1 .787.713l.275 5.5a.75.75 0 0 1-1.498.075l-.275-5.5A.75.75 0 0 1 6.05 6Zm3.9 0a.75.75 0 0 1 .712.787l-.275 5.5a.75.75 0 0 1-1.498-.075l.275-5.5a.75.75 0 0 1 .786-.711Z" clipRule="evenodd" />
-                  </svg>
-                </button>
-              </Form>
-            </div>
-          ))}
+          {videos.map((video) => {
+            if (!video.is_complete) {
+              return (
+                <div
+                  key={video.id}
+                  className="px-3 py-1.5 flex items-center justify-between rounded-lg odd:bg-gray-100"
+                >
+                  <div className="animate-pulse flex space-x-4">
+                    <div className="rounded-full bg-slate-700 h-10 w-10"></div>
+                    <div className="flex-1 space-y-6 py-1">
+                      <div className="h-2 bg-slate-700 rounded"></div>
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-3 gap-4">
+                          <div className="h-2 bg-slate-700 rounded col-span-2"></div>
+                          <div className="h-2 bg-slate-700 rounded col-span-1"></div>
+                        </div>
+                        <div className="h-2 bg-slate-700 rounded"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            return (
+              <div
+                key={video.id}
+                className="px-3 py-1.5 flex items-center justify-between rounded-lg odd:bg-gray-100"
+              >
+                <a href={`/videos/${video.id}`} className="text-sm">
+                  {video.title}
+                </a>
+                <Form action="/delete-video" method="post">
+                  <input type="hidden" name="video_id" value={video.id} />
+                  <button type="submit" aria-label="Delete video">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4">
+                      <path fillRule="evenodd" d="M5 3.25V4H2.75a.75.75 0 0 0 0 1.5h.3l.815 8.15A1.5 1.5 0 0 0 5.357 15h5.285a1.5 1.5 0 0 0 1.493-1.35l.815-8.15h.3a.75.75 0 0 0 0-1.5H11v-.75A2.25 2.25 0 0 0 8.75 1h-1.5A2.25 2.25 0 0 0 5 3.25Zm2.25-.75a.75.75 0 0 0-.75.75V4h3v-.75a.75.75 0 0 0-.75-.75h-1.5ZM6.05 6a.75.75 0 0 1 .787.713l.275 5.5a.75.75 0 0 1-1.498.075l-.275-5.5A.75.75 0 0 1 6.05 6Zm3.9 0a.75.75 0 0 1 .712.787l-.275 5.5a.75.75 0 0 1-1.498-.075l.275-5.5a.75.75 0 0 1 .786-.711Z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </Form>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
