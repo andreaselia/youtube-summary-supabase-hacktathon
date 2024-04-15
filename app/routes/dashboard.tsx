@@ -115,7 +115,7 @@ export default function Dashboard() {
               return (
                 <div
                   key={video.id}
-                  className="px-3 py-1.5 flex items-center justify-between rounded-lg border shadow-sm border-gray-300 bg-white"
+                  className="p-5 flex items-center justify-between rounded-xl border shadow-sm border-gray-300 bg-white"
                 >
                   <div className="w-full animate-pulse">
                     <div className="w-full h-5 bg-gray-500 rounded"></div>
