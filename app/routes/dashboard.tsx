@@ -117,8 +117,8 @@ export default function Dashboard() {
                   key={video.id}
                   className="px-3 py-1.5 flex items-center justify-between rounded-lg odd:bg-gray-100"
                 >
-                  <div className="animate-pulse">
-                    <div className="w-full h-3 bg-slate-700 rounded"></div>
+                  <div className="w-full animate-pulse">
+                    <div className="w-full h-5 bg-gray-500 rounded"></div>
                   </div>
                 </div>
               );
