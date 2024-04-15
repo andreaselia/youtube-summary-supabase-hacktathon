@@ -57,6 +57,7 @@ Deno.serve(async (req) => {
       title: captions.title,
       description: captions.description,
       summary: subtitlesSummary,
+      is_complete: true,
     })
     .eq("id", video.id)
 

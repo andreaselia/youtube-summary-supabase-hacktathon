@@ -39,7 +39,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     title: video.title,
     description: video.description,
     summary: video.summary ? parseMarkdown(video.summary) : "",
-    is_loading: video.is_loading,
+    is_complete: video.is_complete,
   }, { headers });
 };
 
@@ -48,7 +48,7 @@ export default function Dashboard() {
 
   console.log("loaderResponse", loaderResponse);
 
-  if (loaderResponse.is_loading) {
+  if (!loaderResponse.is_complete) {
     return (
       <p>Fetching captions...</p>
     );
