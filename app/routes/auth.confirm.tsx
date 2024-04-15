@@ -4,11 +4,10 @@ import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { createSupabaseServerClient } from "~/supabase.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  if (
-    request.method === "HEAD" ||
-    request.method === "OPTIONS" ||
-    isbot(request.headers.get("user-agent") || "")
-) {
+  const unfurlMethods = ["HEAD", "OPTIONS"];
+  const isBot = isbot(request.headers.get("user-agent") || "");
+
+  if (unfurlMethods.includes(request.method) || isBot) {
     return new Response(null, {
       status: 204,
     });
