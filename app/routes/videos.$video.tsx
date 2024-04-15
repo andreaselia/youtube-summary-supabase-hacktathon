@@ -56,11 +56,13 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold underline">
-        {loaderResponse.title}
-      </h1>
-      <p>{loaderResponse.description}</p>
-      <div className="mx-auto max-w-sm prose">
+      <div className="mx-auto max-w-screen-xl prose">
+        <h1 className="text-3xl font-bold underline">
+          {loaderResponse.title}
+        </h1>
+        <p>{loaderResponse.description}</p>
+      </div>
+      <div className="mt-6 mx-auto max-w-screen-md prose">
         <Markdown content={loaderResponse.summary} />
       </div>
     </div>
