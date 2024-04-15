@@ -55,14 +55,14 @@ export default function Dashboard() {
   }
 
   return (
-    <div>
-      <div className="mx-auto max-w-screen-xl prose">
+    <div className="py-8 md:py-16 prose">
+      <div className="mx-auto max-w-screen-lg prose">
         <h1 className="text-3xl font-bold underline">
           {loaderResponse.title}
         </h1>
         <p>{loaderResponse.description}</p>
       </div>
-      <div className="mt-6 mx-auto max-w-screen-md prose">
+      <div className="mt-6 mx-auto max-w-screen-md">
         <Markdown content={loaderResponse.summary} />
       </div>
     </div>
