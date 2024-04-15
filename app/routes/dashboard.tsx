@@ -92,7 +92,7 @@ export default function Dashboard() {
         </Form>
       </div>
 
-      <div className="mt-8 mx-auto w-full max-w-sm">
+      <div className="mt-8 mx-auto w-full max-w-md">
         <Form ref={formRef} method="post" className="flex items-center space-x-2">
           <input
             name="video_url"
