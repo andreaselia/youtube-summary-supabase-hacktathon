@@ -35,7 +35,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const { error } = await supabaseClient.auth.signInWithOtp({
     email: formData.get("email") as string,
     options: {
-      emailRedirectTo: "http://localhost:5173/auth/confirm",
+      emailRedirectTo: `${process.env.BASE_URL}/auth/confirm`,
     },
   });
 
