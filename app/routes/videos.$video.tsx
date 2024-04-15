@@ -40,6 +40,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     description: video.description,
     summary: video.summary ? parseMarkdown(video.summary) : "",
     is_complete: video.is_complete,
+    video_url: video.video_url,
   }, { headers });
 };
 
@@ -61,6 +62,7 @@ export default function Dashboard() {
       <div className="mx-auto w-full max-w-screen-lg prose">
         <h1>{loaderResponse.title}</h1>
         <p>{loaderResponse.description}</p>
+        <a href={loaderResponse.video_url} className="text-slate-800">View Video</a>
       </div>
       <div className="mt-6 mx-auto w-full max-w-screen-md prose">
         <Markdown content={loaderResponse.summary} />
