@@ -16,8 +16,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const tokenHash = url.searchParams.get("token_hash");
 
-  console.log("tokenHash", tokenHash);
-
   if (tokenHash) {
     const { supabaseClient, headers } = createSupabaseServerClient(request);
     const { error } = await supabaseClient.auth.verifyOtp({
@@ -25,9 +23,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       type: "email",
     });
 
-    console.log("error", error);
-
     if (error) {
+      console.error(error);
+
       return redirect("/sign-in");
     }
 

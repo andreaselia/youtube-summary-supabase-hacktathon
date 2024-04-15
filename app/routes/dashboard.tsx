@@ -45,8 +45,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const formData = await request.formData();
 
-  console.log("video_url", formData.get("video_url"));
-
   const { data: { user } } = await supabaseClient.auth.getUser()
 
   const { error } = await supabaseClient.from("videos").insert({
@@ -54,9 +52,9 @@ export async function action({ request }: ActionFunctionArgs) {
     video_url: formData.get("video_url") as string,
   });
 
-  console.log("error", error);
-
   if (error) {
+    console.error(error);
+
     return json({ success: false }, { headers });
   }
 
@@ -67,8 +65,6 @@ export default function Dashboard() {
   const actionResponse = useActionData<typeof action>();
   const formRef = useRef<HTMLFormElement>(null);
   const videos: Video[] = useLoaderData();
-
-  console.log("actionResponse", actionResponse);
 
   useEffect(() => {
     if (actionResponse?.success) {

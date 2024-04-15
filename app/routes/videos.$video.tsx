@@ -47,8 +47,6 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 export default function Dashboard() {
   const loaderResponse = useLoaderData<typeof loader>();
 
-  console.log("loaderResponse", loaderResponse);
-
   if (!loaderResponse.is_complete) {
     return (
       <div className="w-screen h-screen flex items-center justify-center">

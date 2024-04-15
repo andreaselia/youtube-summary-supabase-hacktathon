@@ -31,8 +31,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const formData = await request.formData();
 
-  console.log("email", formData.get("email"));
-
   const { error } = await supabaseClient.auth.signInWithOtp({
     email: formData.get("email") as string,
     options: {
@@ -40,10 +38,9 @@ export async function action({ request }: ActionFunctionArgs) {
     },
   });
 
-  console.log("error", error);
-
-  // TODO: if there is no error, we show "Please check you email" message
   if (error) {
+    console.error(error);
+
     return json({ success: false }, { headers });
   }
 
@@ -53,8 +50,6 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function SignIn() {
   const actionResponse = useActionData<typeof action>();
   const formRef = useRef<HTMLFormElement>(null);
-
-  console.log("actionResponse", actionResponse);
 
   useEffect(() => {
     if (actionResponse?.success) {
@@ -80,7 +75,7 @@ export default function SignIn() {
               type="email"
               placeholder="Your Email"
               required
-              className="px-3 py-2 bg-white border shadow-sm border-gray-300 placeholder-gray-400 disabled:bg-gray-50 disabled:text-gray-500 disabled:border-gray-200 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1 invalid:border-pink-500 invalid:text-pink-600 focus:invalid:border-pink-500 focus:invalid:ring-pink-500 disabled:shadow-none"
+              className="px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1 invalid:border-pink-500 invalid:text-pink-600 focus:invalid:border-pink-500 focus:invalid:ring-pink-500 disabled:shadow-none"
             />
             <button
               type="submit"
