@@ -4,13 +4,20 @@ import { createSupabaseServerClient } from "~/supabase.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
-  const code = url.searchParams.get("code");
+  const tokenHash = url.searchParams.get("token_hash");
 
-  console.log("code", code);
+  console.log("tokenHash", tokenHash);
 
-  if (code) {
+  if (tokenHash) {
     const { supabaseClient, headers } = createSupabaseServerClient(request);
-    const { error } = await supabaseClient.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabaseClient.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: 'email',
+    });
+
+    console.log("data", data);
+
+    // const { error } = await supabaseClient.auth.exchangeCodeForSession(code);
 
     console.log("error", error);
 
