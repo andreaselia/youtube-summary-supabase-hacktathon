@@ -50,13 +50,15 @@ export default function Dashboard() {
 
   if (!loaderResponse.is_complete) {
     return (
-      <p>Fetching captions...</p>
+      <div className="w-screen h-screen flex items-center justify-center">
+        <p>Fetching captions...</p>
+      </div>
     );
   }
 
   return (
-    <div>
-    <div className="mx-auto w-full max-w-screen-lg prose">
+    <div className="py-8 md:py-16">
+      <div className="mx-auto w-full max-w-screen-lg prose">
         <h1>{loaderResponse.title}</h1>
         <p>{loaderResponse.description}</p>
       </div>
