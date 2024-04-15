@@ -62,7 +62,7 @@ export default function Dashboard() {
       <div className="mx-auto w-full max-w-screen-lg prose">
         <h1>{loaderResponse.title}</h1>
         <p>{loaderResponse.description}</p>
-        <a href={loaderResponse.video_url} className="text-slate-800">View Video</a>
+        <a href={loaderResponse.video_url} className="text-gray-800">View Video</a>
       </div>
       <div className="mt-6 mx-auto w-full max-w-screen-md prose">
         <Markdown content={loaderResponse.summary} />
