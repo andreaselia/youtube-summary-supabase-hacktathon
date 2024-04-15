@@ -60,7 +60,7 @@ export default function Dashboard() {
         {loaderResponse.title}
       </h1>
       <p>{loaderResponse.description}</p>
-      <div className="mx-auto max-w-sm markdown">
+      <div className="mx-auto max-w-sm prose">
         <Markdown content={loaderResponse.summary} />
       </div>
     </div>
