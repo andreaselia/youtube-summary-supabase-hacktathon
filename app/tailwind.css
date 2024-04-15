@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.markdown {
+  @apply gap-y-4;
+}
+
 .markdown h1, h2, h3, h4, h5, h6 {
   @apply font-bold;
 }
