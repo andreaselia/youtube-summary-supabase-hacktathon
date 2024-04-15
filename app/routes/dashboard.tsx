@@ -80,7 +80,7 @@ export default function Dashboard() {
       <Form action="/sign-out" method="post">
         <button type="submit">Sign Out</button>
       </Form>
-      <div className="mx-auto max-w-sm">
+      <div className="mx-auto w-full max-w-sm">
         <Form ref={formRef} method="post" className="flex items-center space-x-2">
           <input
             name="video_url"
