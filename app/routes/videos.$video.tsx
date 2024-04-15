@@ -38,7 +38,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   return json({
     title: video.title,
     description: video.description,
-    summary: parseMarkdown(video.summary),
+    summary: video.summary ? parseMarkdown(video.summary) : "",
   }, { headers });
 };
 
