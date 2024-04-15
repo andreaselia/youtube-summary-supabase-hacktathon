@@ -39,6 +39,8 @@ create policy "Individuals can delete their own videos." on videos for
 create function public.handle_new_video()
 returns trigger as $$
 begin
+  raise notice 'New video created: %', new.id;
+
   perform "net"."http_post"(
     supabase_url() || '/functions/v1/transcribe'::text,
     jsonb_build_object(
