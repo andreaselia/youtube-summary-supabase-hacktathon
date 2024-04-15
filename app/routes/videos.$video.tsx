@@ -57,9 +57,7 @@ export default function Dashboard() {
   return (
     <div>
     <div className="mx-auto w-full max-w-screen-lg prose">
-        <h1 className="text-3xl font-bold underline">
-          {loaderResponse.title}
-        </h1>
+        <h1>{loaderResponse.title}</h1>
         <p>{loaderResponse.description}</p>
       </div>
       <div className="mt-6 mx-auto w-full max-w-screen-md prose">

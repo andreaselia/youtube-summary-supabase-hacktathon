@@ -41,6 +41,7 @@ Deno.serve(async (req) => {
         Include a section for the summary, key takeaways, highlights and keywords.
         Ignore any intro and outro in the video that may not be relevant.
         Return the summary in markdown format.
+        Use H3 for the key takeaways, highlights and keywords.
         Captions: ${captions.subtitles}`,
     }],
     model: 'gpt-3.5-turbo',

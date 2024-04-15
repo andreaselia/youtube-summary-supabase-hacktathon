@@ -10,14 +10,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   if (tokenHash) {
     const { supabaseClient, headers } = createSupabaseServerClient(request);
-    const { data, error } = await supabaseClient.auth.verifyOtp({
+    const { error } = await supabaseClient.auth.verifyOtp({
       token_hash: tokenHash,
-      type: 'email',
+      type: "email",
     });
-
-    console.log("data", data);
-
-    // const { error } = await supabaseClient.auth.exchangeCodeForSession(code);
 
     console.log("error", error);
 
