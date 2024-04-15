@@ -73,14 +73,21 @@ export default function Dashboard() {
   }, [actionResponse]);
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline">
-        Dashboard
-      </h1>
-      <Form action="/sign-out" method="post">
-        <button type="submit">Sign Out</button>
-      </Form>
-      <div className="mx-auto w-full max-w-sm">
+    <div className="mx-auto w-full max-w-screen-sm">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">
+          Dashboard
+        </h1>
+        <Form action="/sign-out" method="post">
+          <button
+            type="submit"
+            className="mt-4 px-2.5 py-1 bg-gray-100 rounded-md text-sm"
+          >
+            Sign Out
+          </button>
+        </Form>
+      </div>
+      <div className="mt-6 mx-auto w-full max-w-sm">
         <Form ref={formRef} method="post" className="flex items-center space-x-2">
           <input
             name="video_url"
