@@ -2,7 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-.markdown {
+.markdown,
+.markdown artcle,
+.markdown section {
   @apply gap-y-4;
 }
 
