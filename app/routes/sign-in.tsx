@@ -1,6 +1,7 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
+import { useEffect, useRef } from "react";
 
 import { createSupabaseServerClient } from "~/supabase.server";
 
@@ -51,8 +52,15 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function SignIn() {
   const actionResponse = useActionData<typeof action>();
+  const formRef = useRef<HTMLFormElement>(null);
 
   console.log("actionResponse", actionResponse);
+
+  useEffect(() => {
+    if (actionResponse?.success) {
+      formRef.current?.reset();
+    }
+  }, [actionResponse]);
 
   return (
     <div className="w-screen h-screen flex items-center justify-center">
@@ -66,7 +74,7 @@ export default function SignIn() {
             <p>Please check your email for the sign in link.</p>
           )}
 
-          <Form method="post">
+          <Form ref={formRef} method="post">
             <input
               name="email"
               type="email"
