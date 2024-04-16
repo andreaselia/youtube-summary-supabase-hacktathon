@@ -64,7 +64,7 @@ export default function SignIn() {
           Sign In
         </h1>
 
-        <div className="mt-4 gap-y-2">
+        <div className="mt-4 space-y-4">
           {actionResponse?.success && (
             <p>Please check your email for the sign in link.</p>
           )}
