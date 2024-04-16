@@ -23,7 +23,11 @@ Deno.serve(async (req) => {
   // eslint-disable-next-line no-useless-escape
   const regexp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/gi
   const match = regexp.exec(video.youtube_url)
-  const videoId = match ? match[1] : "dQw4w9WgXcQ"
+  const videoId = match ? match[1] : null
+
+  if (!videoId) {
+    throw new Error("Invalid YouTube URL")
+  }
 
   console.log("Fetching captions for video:", videoId)
 
