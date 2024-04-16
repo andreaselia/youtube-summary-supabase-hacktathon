@@ -53,7 +53,10 @@ begin
     jsonb_build_object(
       'video', to_jsonb(new.*)
     ),
-    headers:='{"Content-Type": "application/json"}'::jsonb
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', current_setting('request.headers')::json->>'authorization'
+    )
   ) as request_id;
 
   return new;

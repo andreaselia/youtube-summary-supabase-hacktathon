@@ -8,8 +8,8 @@ console.log("Hello from Functions!")
 Deno.serve(async (req) => {
   const supabaseClient = createClient(
     Deno.env.get("MY_SUPABASE_URL") ?? "",
-    Deno.env.get("MY_SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    // { global: { headers: { Authorization: req.headers.get("Authorization")! } } }
+    Deno.env.get("MY_SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    { global: { headers: { Authorization: req.headers.get("Authorization")! } } }
   )
 
   const openai = new OpenAI({
@@ -51,19 +51,14 @@ Deno.serve(async (req) => {
 
   console.log("Captions found")
 
-  const { error } = await supabaseClient
+  await supabaseClient
     .from("videos")
     .update({
       ...videoData,
       content: subtitlesSummary,
     })
     .eq("id", video.id)
-
-  if (error) {
-    console.error("Failed to update video:", error)
-
-    console.log(error.message)
-  }
+    .throwOnError()
 
   return new Response(
     JSON.stringify({

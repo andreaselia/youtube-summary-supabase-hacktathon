@@ -33,7 +33,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     return redirect("/sign-in");
   }
 
-  const { data: videos, error } = await supabaseClient.from("videos").select("*");
+  const { data: videos, error } = await supabaseClient
+    .from("videos")
+    .select("*")
+    .neq("current_state", "failed");
 
   if (error) {
     return json([], { headers });
@@ -109,7 +112,7 @@ export default function Dashboard() {
 
         <div className="mt-4 space-y-2">
           {videos.map((video) => {
-            if (!video.is_complete) {
+            if (video.current_state === "pending") {
               return (
                 <div
                   key={video.id}
