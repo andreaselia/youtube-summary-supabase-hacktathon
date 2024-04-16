@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
 
   // eslint-disable-next-line no-useless-escape
   const regexp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/gi
-  const match = regexp.exec(video.video_url)
+  const match = regexp.exec(video.youtube_url)
   const videoId = match ? match[1] : "dQw4w9WgXcQ"
 
   console.log("Fetching captions for video:", videoId)
@@ -56,6 +56,7 @@ Deno.serve(async (req) => {
     .update({
       ...videoData,
       content: subtitlesSummary,
+      current_state: "active",
     })
     .eq("id", video.id)
     .throwOnError()
