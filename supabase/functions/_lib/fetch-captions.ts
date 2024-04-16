@@ -22,12 +22,14 @@ export const fetchCaptions = async (videoId: string) => {
   const titleMatch = videoData.match(/<meta name="title" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
   const durationMatch = videoData.match(/<meta name="duration" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
   const datePublishedMatch = videoData.match(/<meta name="datePublished" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
-  const genreMatch = videoData.match(/<meta name="genre" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
+
+  console.log("titleMatch", titleMatch);
+  console.log("durationMatch", durationMatch);
+  console.log("datePublishedMatch", datePublishedMatch);
 
   const title = titleMatch ? titleMatch[1] : "No title found";
   const duration = durationMatch ? durationMatch[1] : null;
   const datePublished = datePublishedMatch ? datePublishedMatch[1] : null;
-  const genre = genreMatch ? genreMatch[1] : null;
 
   const captionTracksRegex = /"captionTracks":(\[.*?\])/;
   const captionTracksRegexResult = captionTracksRegex.exec(videoData);
