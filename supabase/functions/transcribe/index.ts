@@ -29,18 +29,14 @@ Deno.serve(async (req) => {
 
   const captions = await fetchCaptions(videoId)
 
-  // Provide a summary of the video content structured with headings,
-  // key insights, highlighted points, and keywords with corresponding
-  // descriptive sentences. Each keyword should be followed by a colon
-  // and a sentence elaborating on its significance in the video.
   const chatCompletion = await openai.chat.completions.create({
     messages: [{
       role: "user",
       content: `
         Write a short summary of the video captions below.
-        Include a section for the summary, key takeaways, highlights and keywords.
-        Each keyword should be followed by a colon and a sentence elaborating on its significance in the video.
         Ignore any intro and outro in the video that may not be relevant.
+        Include a section for the summary of Main Insights, Essential Points, and Keywords.
+        Each keyword in the "Keywords" section should be followed by a colon and a sentence elaborating on its significance in the video.
         Return the summary in markdown format, headings should be H3 and content should be in bullet points.
         Headings should not have a colon or period at the end.
         Captions: ${captions.subtitles}`,
@@ -61,6 +57,7 @@ Deno.serve(async (req) => {
       is_complete: true,
       duration: captions.duration,
       author: captions.author,
+      creation_date: captions.uploaded,
     })
     .eq("id", video.id)
 

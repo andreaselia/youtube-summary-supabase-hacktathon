@@ -15,7 +15,7 @@ export const fetchCaptions = async (videoId: string) => {
   const videoData = await videoResponse.text();
 
   if (!videoData.includes("captionTracks")) {
-    return { error: `Could not find captions for video ${videoId}` };
+    throw new Error(`Could not find captions for video ${videoId}`);
   }
 
   const titleMatch = videoData.match(/<meta name="title" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
@@ -26,7 +26,7 @@ export const fetchCaptions = async (videoId: string) => {
   const captionTracksRegexResult = captionTracksRegex.exec(videoData);
 
   if (!captionTracksRegexResult) {
-    return { error: `Could not extract captions for video ${videoId}` };
+    throw new Error(`Could not extract captions for video ${videoId}`);
   }
 
   const durationRegex = /"approxDurationMs":"(\d+)"/;
@@ -37,17 +37,19 @@ export const fetchCaptions = async (videoId: string) => {
   const authorRegexResult = authorRegex.exec(videoData);
   const videoOwner = authorRegexResult ? authorRegexResult[1] : null;
 
+  const uploadDateRegex = /"uploadDate":"([^"]+)"/;
+  const uploadDateRegexResult = uploadDateRegex.exec(videoData);
+  const uploadDate = uploadDateRegexResult ? uploadDateRegexResult[1] : null;
+
   const captionTracks = JSON.parse(captionTracksRegexResult[1]);
 
-  const lang = "en";
-
-  const subtitle =
-    captionTracks.find((track: CaptionTrack) => track.vssId === `.${lang}`) ||
-    captionTracks.find((track: CaptionTrack) => track.vssId === `a.${lang}`) ||
-    captionTracks.find((track: CaptionTrack) => track.vssId && track.vssId.match(`.${lang}`));
+  const subtitle = captionTracks.find((track: CaptionTrack) =>
+    track.vssId === ".en" || track.vssId === "a.en" ||
+      (track.vssId && track.vssId.match(".en"))
+  );
 
   if (!subtitle?.baseUrl) {
-    return { error: `Could not find en lang for video ${videoId}` };
+    throw new Error(`Could not find en lang for video ${videoId}`);
   }
 
   const subtitlesResponse = await fetch(subtitle.baseUrl);
@@ -59,7 +61,6 @@ export const fetchCaptions = async (videoId: string) => {
     .split("</text>")
     .filter((line: string) => line && line.trim())
     .reduce((acc: Subtitle[], line: string) => {
-
       const htmlText = line
         .replace(/<text.+>/, "")
         .replace(/&amp;/gi, "&")
@@ -81,5 +82,6 @@ export const fetchCaptions = async (videoId: string) => {
     subtitles: joinedLines,
     duration: videoDuration,
     author: videoOwner,
+    uploaded: uploadDate,
   };
 };

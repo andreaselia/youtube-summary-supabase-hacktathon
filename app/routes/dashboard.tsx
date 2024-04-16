@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import { useEffect, useRef } from "react";
 
 import { createSupabaseServerClient } from "~/supabase.server";
@@ -10,6 +10,7 @@ type Video = {
   user_id: string;
   video_url: string;
   title: string;
+  author: string;
   summary: string;
   is_complete: boolean;
 };
@@ -72,7 +73,7 @@ export default function Dashboard() {
   }, [actionResponse]);
 
   return (
-    <div className="py-8 md:py-16 mx-auto w-full max-w-screen-sm">
+    <div className="py-8 md:py-16 mx-auto w-full max-w-screen-md">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">
           Dashboard
@@ -87,7 +88,7 @@ export default function Dashboard() {
         </Form>
       </div>
 
-      <div className="mt-8 mx-auto w-full max-w-md">
+      <div className="mt-8 mx-auto w-full max-w-screen-sm">
         <Form ref={formRef} method="post" className="flex items-center space-x-2">
           <input
             name="video_url"
@@ -122,21 +123,62 @@ export default function Dashboard() {
             return (
               <div
                 key={video.id}
-                className="p-5 flex items-center justify-between rounded-xl border shadow-sm border-gray-300 bg-white"
+                className="p-4 flex items-center justify-between rounded-lg border shadow-sm border-gray-300 bg-white"
               >
-                <a
-                  href={`/videos/${video.id}`}
-                  className="text-sm"
-                  dangerouslySetInnerHTML={{ __html: video.title }}
-                />
-                <Form action="/delete-video" method="post">
-                  <input type="hidden" name="video_id" value={video.id} />
-                  <button type="submit" aria-label="Delete video">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4">
-                      <path fillRule="evenodd" d="M5 3.25V4H2.75a.75.75 0 0 0 0 1.5h.3l.815 8.15A1.5 1.5 0 0 0 5.357 15h5.285a1.5 1.5 0 0 0 1.493-1.35l.815-8.15h.3a.75.75 0 0 0 0-1.5H11v-.75A2.25 2.25 0 0 0 8.75 1h-1.5A2.25 2.25 0 0 0 5 3.25Zm2.25-.75a.75.75 0 0 0-.75.75V4h3v-.75a.75.75 0 0 0-.75-.75h-1.5ZM6.05 6a.75.75 0 0 1 .787.713l.275 5.5a.75.75 0 0 1-1.498.075l-.275-5.5A.75.75 0 0 1 6.05 6Zm3.9 0a.75.75 0 0 1 .712.787l-.275 5.5a.75.75 0 0 1-1.498-.075l.275-5.5a.75.75 0 0 1 .786-.711Z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                </Form>
+                <div className="flex flex-col">
+                  <h3
+                    className="text-sm font-semibold"
+                    dangerouslySetInnerHTML={{ __html: video.title }}
+                  />
+
+                  <div className="mt-2 flex space-x-4">
+                    <span className="text-gray-800 text-xs inline-flex items-center gap-x-1">
+                      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
+                        <circle cx="12" cy="8" r="3.25" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6.8475 19.25H17.1525C18.2944 19.25 19.174 18.2681 18.6408 17.2584C17.8563 15.7731 16.068 14 12 14C7.93201 14 6.14367 15.7731 5.35924 17.2584C4.82597 18.2681 5.70558 19.25 6.8475 19.25Z" />
+                      </svg>
+                      {video.author}
+                    </span>
+
+                    <span className="text-gray-800 text-xs inline-flex items-center gap-x-1">
+                      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4.75 8.75C4.75 7.64543 5.64543 6.75 6.75 6.75H17.25C18.3546 6.75 19.25 7.64543 19.25 8.75V17.25C19.25 18.3546 18.3546 19.25 17.25 19.25H6.75C5.64543 19.25 4.75 18.3546 4.75 17.25V8.75Z" />
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 4.75V8.25" />
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 4.75V8.25" />
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7.75 10.75H16.25" />
+                      </svg>
+                      <span>November 16, 2022</span>
+                      {/* {loaderResponse.creation_date} */}
+                    </span>
+
+                    <span className="text-gray-800 text-xs inline-flex items-center gap-x-1">
+                      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
+                        <circle cx="12" cy="12" r="7.25" stroke="currentColor" strokeWidth="1.5" />
+                        <path stroke="currentColor" strokeWidth="1.5" d="M12 8V12L14 14" />
+                      </svg>
+                      <span>6:49</span>
+                      {/* {loaderResponse.duration} */}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex gap-x-1">
+                  <Form action="/delete-video" method="post">
+                    <input type="hidden" name="video_id" value={video.id} />
+                    <button
+                      type="submit"
+                      className="text-xs px-3 py-1.5 text-red-600 text-center"
+                    >
+                      Delete
+                    </button>
+                  </Form>
+
+                  <Link
+                    to={`/videos/${video.id}`}
+                    className="bg-gray-100 text-xs px-3 py-1.5 rounded-md text-gray-800 font-semibold text-center"
+                  >
+                    View
+                  </Link>
+                </div>
               </div>
             );
           })}
