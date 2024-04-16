@@ -20,7 +20,7 @@ create table videos (
   video_url text not null,
   title text,
   summary text,
-  duration interval,
+  duration numeric,
   author text,
   creation_date timestamp with time zone default timezone('utc'::text, now()) not null,
   is_complete boolean default false,

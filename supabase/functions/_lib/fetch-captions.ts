@@ -22,16 +22,22 @@ export const fetchCaptions = async (videoId: string) => {
 
   const title = titleMatch ? titleMatch[1] : "No title found";
 
-  const regex = /"captionTracks":(\[.*?\])/;
-  const regexResult = regex.exec(videoData);
+  const captionTracksRegex = /"captionTracks":(\[.*?\])/;
+  const captionTracksRegexResult = captionTracksRegex.exec(videoData);
 
-  if (!regexResult) {
-    return { error: `Could not extract captionTracks for video ${videoId}` };
+  if (!captionTracksRegexResult) {
+    return { error: `Could not extract captions for video ${videoId}` };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, captionTracksJson] = regexResult;
-  const captionTracks = JSON.parse(captionTracksJson);
+  const durationRegex = /"approxDurationMs":"(\d+)"/;
+  const durationRegexResult = durationRegex.exec(videoData);
+  const videoDuration = durationRegexResult ? parseInt(durationRegexResult[1], 10) : 0;
+
+  const authorRegex = /"ownerChannelName":"([^"]+)"/;
+  const authorRegexResult = authorRegex.exec(videoData);
+  const videoOwner = authorRegexResult ? authorRegexResult[1] : null;
+
+  const captionTracks = JSON.parse(captionTracksRegexResult[1]);
 
   const lang = "en";
 
@@ -73,5 +79,7 @@ export const fetchCaptions = async (videoId: string) => {
   return {
     title,
     subtitles: joinedLines,
+    duration: videoDuration,
+    author: videoOwner,
   };
 };

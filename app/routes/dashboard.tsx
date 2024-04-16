@@ -124,9 +124,11 @@ export default function Dashboard() {
                 key={video.id}
                 className="p-5 flex items-center justify-between rounded-xl border shadow-sm border-gray-300 bg-white"
               >
-                <a href={`/videos/${video.id}`} className="text-sm">
-                  {video.title}
-                </a>
+                <a
+                  href={`/videos/${video.id}`}
+                  className="text-sm"
+                  dangerouslySetInnerHTML={{ __html: video.title }}
+                />
                 <Form action="/delete-video" method="post">
                   <input type="hidden" name="video_id" value={video.id} />
                   <button type="submit" aria-label="Delete video">
