@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
 
   console.log("Fetching captions for video:", videoId)
 
-  const captions = await fetchCaptions(videoId)
+  const videoData = await fetchCaptions(videoId)
 
   const chatCompletion = await openai.chat.completions.create({
     messages: [{
@@ -37,9 +37,11 @@ Deno.serve(async (req) => {
         Ignore any intro and outro in the video that may not be relevant.
         Include a section for the summary of Main Insights, Essential Points, and Keywords.
         Each keyword in the "Keywords" section should be followed by a colon and a sentence elaborating on its significance in the video.
+        The keywords should be in the same order as they appear in the video, and the sentences should be concise.
+        The keywords and colon should be bold, and the sentences should be in plain text.
         Return the summary in markdown format, headings should be H3 and content should be in bullet points.
         Headings should not have a colon or period at the end.
-        Captions: ${captions.subtitles}`,
+        Captions: ${videoData.content}`,
     }],
     model: "gpt-3.5-turbo",
     stream: false,
@@ -52,12 +54,8 @@ Deno.serve(async (req) => {
   const { error } = await supabaseClient
     .from("videos")
     .update({
-      title: captions.title,
-      summary: subtitlesSummary,
-      is_complete: true,
-      duration: captions.duration,
-      author: captions.author,
-      creation_date: captions.uploaded,
+      ...videoData,
+      content: subtitlesSummary,
     })
     .eq("id", video.id)
 

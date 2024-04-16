@@ -18,9 +18,16 @@ export const fetchCaptions = async (videoId: string) => {
     throw new Error(`Could not find captions for video ${videoId}`);
   }
 
+
   const titleMatch = videoData.match(/<meta name="title" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
+  const durationMatch = videoData.match(/<meta name="duration" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
+  const datePublishedMatch = videoData.match(/<meta name="datePublished" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
+  const genreMatch = videoData.match(/<meta name="genre" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
 
   const title = titleMatch ? titleMatch[1] : "No title found";
+  const duration = durationMatch ? durationMatch[1] : null;
+  const datePublished = datePublishedMatch ? datePublishedMatch[1] : null;
+  const genre = genreMatch ? genreMatch[1] : null;
 
   const captionTracksRegex = /"captionTracks":(\[.*?\])/;
   const captionTracksRegexResult = captionTracksRegex.exec(videoData);
@@ -29,17 +36,9 @@ export const fetchCaptions = async (videoId: string) => {
     throw new Error(`Could not extract captions for video ${videoId}`);
   }
 
-  const durationRegex = /"approxDurationMs":"(\d+)"/;
-  const durationRegexResult = durationRegex.exec(videoData);
-  const videoDuration = durationRegexResult ? parseInt(durationRegexResult[1], 10) : 0;
-
   const authorRegex = /"ownerChannelName":"([^"]+)"/;
   const authorRegexResult = authorRegex.exec(videoData);
   const videoOwner = authorRegexResult ? authorRegexResult[1] : null;
-
-  const uploadDateRegex = /"uploadDate":"([^"]+)"/;
-  const uploadDateRegexResult = uploadDateRegex.exec(videoData);
-  const uploadDate = uploadDateRegexResult ? uploadDateRegexResult[1] : null;
 
   const captionTracks = JSON.parse(captionTracksRegexResult[1]);
 
@@ -79,9 +78,9 @@ export const fetchCaptions = async (videoId: string) => {
 
   return {
     title,
-    subtitles: joinedLines,
-    duration: videoDuration,
-    author: videoOwner,
-    uploaded: uploadDate,
+    content: joinedLines,
+    duration,
+    channel: videoOwner,
+    published_at: datePublished,
   };
 };
