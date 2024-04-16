@@ -19,7 +19,6 @@ create table videos (
   user_id uuid references auth.users not null,
   video_url text not null,
   title text,
-  description text,
   summary text,
   duration number,
   author text,

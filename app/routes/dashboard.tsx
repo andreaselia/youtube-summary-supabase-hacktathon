@@ -10,7 +10,6 @@ type Video = {
   user_id: string;
   video_url: string;
   title: string;
-  description: string;
   summary: string;
   is_complete: boolean;
 };

@@ -37,7 +37,6 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
   return json({
     title: video.title,
-    description: video.description,
     summary: video.summary ? parseMarkdown(video.summary) : "",
     is_complete: video.is_complete,
     video_url: video.video_url,
@@ -59,7 +58,6 @@ export default function Dashboard() {
     <div className="py-8 md:py-16">
       <div className="mx-auto w-full max-w-screen-lg prose">
         <h1 dangerouslySetInnerHTML={{ __html: loaderResponse.title }} />
-        <p dangerouslySetInnerHTML={{ __html: loaderResponse.description }} />
         <a href={loaderResponse.video_url} className="text-gray-800 text-sm underline">View Video</a>
       </div>
       <div className="mt-6 mx-auto w-full max-w-screen-md prose">

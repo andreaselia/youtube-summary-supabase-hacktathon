@@ -52,7 +52,6 @@ Deno.serve(async (req) => {
     .from("videos")
     .update({
       title: captions.title,
-      description: captions.description,
       summary: subtitlesSummary,
       is_complete: true,
     })

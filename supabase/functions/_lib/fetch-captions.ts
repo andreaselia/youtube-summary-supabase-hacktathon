@@ -19,10 +19,8 @@ export const fetchCaptions = async (videoId: string) => {
   }
 
   const titleMatch = videoData.match(/<meta name="title" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
-  const descriptionMatch = videoData.match(/<meta name="description" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
 
   const title = titleMatch ? titleMatch[1] : "No title found";
-  const description = descriptionMatch ? descriptionMatch[1] : "No description found";
 
   const regex = /"captionTracks":(\[.*?\])/;
   const regexResult = regex.exec(videoData);
@@ -74,7 +72,6 @@ export const fetchCaptions = async (videoId: string) => {
 
   return {
     title,
-    description,
     subtitles: joinedLines,
   };
 };
