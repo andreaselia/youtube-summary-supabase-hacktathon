@@ -21,6 +21,9 @@ create table videos (
   title text,
   description text,
   summary text,
+  duration number,
+  author text,
+  creation_date timestamp with time zone default timezone('utc'::text, now()) not null,
   is_complete boolean default false,
   inserted_at timestamp with time zone default timezone('utc'::text, now()) not null
 );

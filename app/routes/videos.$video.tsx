@@ -58,8 +58,8 @@ export default function Dashboard() {
   return (
     <div className="py-8 md:py-16">
       <div className="mx-auto w-full max-w-screen-lg prose">
-        <h1>{loaderResponse.title}</h1>
-        <p>{loaderResponse.description}</p>
+        <h1 dangerouslySetInnerHTML={{ __html: loaderResponse.title }} />
+        <p dangerouslySetInnerHTML={{ __html: loaderResponse.description }} />
         <a href={loaderResponse.video_url} className="text-gray-800">View Video</a>
       </div>
       <div className="mt-6 mx-auto w-full max-w-screen-md prose">
