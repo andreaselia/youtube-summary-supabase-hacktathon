@@ -20,8 +20,8 @@ export const fetchCaptions = async (videoId: string) => {
 
 
   const titleMatch = videoData.match(/<meta name="title" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
-  const durationMatch = videoData.match(/<meta name="duration" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
-  const datePublishedMatch = videoData.match(/<meta name="datePublished" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
+  const durationMatch = videoData.match(/<meta itemprop="duration" content="([^"]+)"\s*>/);
+  const datePublishedMatch = videoData.match(/<meta itemprop="datePublished" content="([^"]+)"\s*>/);
 
   console.log("titleMatch", titleMatch);
   console.log("durationMatch", durationMatch);

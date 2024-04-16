@@ -26,9 +26,9 @@ create table videos (
   youtube_url text not null,
   title text,
   content text,
-  duration numeric,
-  channel text,
-  published_at timestamp,
+  duration varchar(10),
+  channel varchar(100),
+  published_at timestamp with time zone,
   current_state video_state default 'pending',
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
