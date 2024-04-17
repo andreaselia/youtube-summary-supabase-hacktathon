@@ -146,6 +146,7 @@ export default function Dashboard() {
             <p className="text-sm text-gray-700">You don't yet have any video summaries.</p>
           </div>
         )}
+
         {videos.map((video) => {
           if (video.current_state === "pending") {
             return (
