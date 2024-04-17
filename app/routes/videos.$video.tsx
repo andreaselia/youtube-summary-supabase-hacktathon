@@ -2,7 +2,7 @@ import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
-import { parseMarkdown } from "~/markdown.server";
+import { parseMarkdown } from "~/services/markdown.server";
 import { Markdown } from "~/components/markdown";
 
 import { createSupabaseServerClient } from "~/supabase.server";
@@ -38,7 +38,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
   return json({
     ...video,
-    summary: video.content ? parseMarkdown(video.content) : "",
+    content: video.content ? parseMarkdown(video.content) : "",
   }, { headers });
 };
 
