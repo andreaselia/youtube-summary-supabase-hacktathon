@@ -66,7 +66,13 @@ export default function SignIn() {
 
         <div className="mt-4 space-y-4">
           {actionResponse?.success && (
-            <p>Please check your email for the sign in link.</p>
+            <div className="px-3 py-2 flex items-center bg-green-50 rounded-md gap-x-1.5">
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-5 h-5 text-green-600">
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4.75 12C4.75 7.99594 7.99594 4.75 12 4.75V4.75C16.0041 4.75 19.25 7.99594 19.25 12V12C19.25 16.0041 16.0041 19.25 12 19.25V19.25C7.99594 19.25 4.75 16.0041 4.75 12V12Z" />
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.75 12.75L10.1837 13.6744C10.5275 14.407 11.5536 14.4492 11.9564 13.7473L14.25 9.75" />
+              </svg>
+              <p className="text-sm text-green-700">We've emailed you a sign in link.</p>
+            </div>
           )}
 
           <Form ref={formRef} method="post">
