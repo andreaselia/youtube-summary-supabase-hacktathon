@@ -5,6 +5,8 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { createSupabaseServerClient } from "~/supabase.server";
 
+const { MY_SUPABASE_URL } = process.env;
+
 type Video = {
   id: string;
   user_id: string;
@@ -171,6 +173,8 @@ export default function Dashboard() {
                 className="text-sm font-semibold hover:underline"
                 dangerouslySetInnerHTML={{ __html: video.title }}
               />
+
+              <audio src={`${MY_SUPABASE_URL}/storage/v1/object/public/tts/${video.id}.mp3`} controls />
 
               <div className="mt-2 flex items-center justify-between">
                 <div className="flex space-x-4">
