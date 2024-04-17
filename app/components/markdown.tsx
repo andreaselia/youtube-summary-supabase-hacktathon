@@ -1,11 +1,7 @@
 import Markdoc, { RenderableTreeNodes } from "@markdoc/markdoc";
 import * as React from "react";
 
-type Props = {
-  content: RenderableTreeNodes;
-};
-
-export function Markdown({ content }: Props) {
+export function Markdown({ content }: { content: RenderableTreeNodes }) {
   return (
     <>
       {Markdoc.renderers.react(content, React)}

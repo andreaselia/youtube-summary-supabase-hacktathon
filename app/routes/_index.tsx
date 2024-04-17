@@ -15,7 +15,7 @@ export default function Index() {
         Coshmu
       </h1>
       <Link to="/dashboard" className="mt-4 px-2.5 py-1 bg-gray-100 rounded-md text-sm">
-        Go to dashboard
+        Go to Dashboard
       </Link>
     </div>
   );
