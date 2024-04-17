@@ -113,7 +113,7 @@ export default function Dashboard() {
             type="submit"
             className="mt-4 px-2.5 py-1 bg-gray-100 rounded-md text-xs"
           >
-            Sign Out
+            Sign out
           </button>
         </Form>
       </div>
