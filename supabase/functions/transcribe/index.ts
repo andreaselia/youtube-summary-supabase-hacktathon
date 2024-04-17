@@ -65,6 +65,21 @@ Deno.serve(async (req) => {
     .eq("id", video.id)
     .throwOnError()
 
+  if (subtitlesSummary) {
+    const tts = await openai.audio.speech.create({
+      model: "tts-1",
+      voice: "nova",
+      input: subtitlesSummary,
+    })
+
+    const arrayBuffer = await tts.arrayBuffer()
+    const uint8Array = new Uint8Array(arrayBuffer)
+
+    await supabaseClient.storage
+      .from("tts")
+      .upload(`${video.id}.mp3`, uint8Array)
+  }
+
   return new Response(
     JSON.stringify({
       success: true,

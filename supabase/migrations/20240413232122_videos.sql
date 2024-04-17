@@ -1,7 +1,8 @@
 create type video_state as ENUM (
   'pending',
   'active',
-  'failed'
+  'failed',
+  'transcribing'
 );
 
 create extension if not exists http;
@@ -30,6 +31,7 @@ create table videos (
   channel varchar(100),
   published_at timestamp with time zone,
   current_state video_state default 'pending',
+  transcribed_at timestamp with time zone,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
