@@ -45,6 +45,8 @@ create policy "Individuals can update their own videos." on videos for
 create policy "Individuals can delete their own videos." on videos for
   delete using (auth.uid() = user_id);
 
+alter publication supabase_realtime add table videos;
+
 create function public.handle_new_video()
 returns trigger as $$
 begin
