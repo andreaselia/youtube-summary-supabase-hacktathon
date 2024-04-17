@@ -143,7 +143,7 @@ export default function Dashboard() {
               <path d="M14.5 10C14.5 10.2761 14.2761 10.5 14 10.5C13.7239 10.5 13.5 10.2761 13.5 10C13.5 9.72386 13.7239 9.5 14 9.5C14.2761 9.5 14.5 9.72386 14.5 10Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
 
-            <p className="text-sm text-gray-700">You don't have any video summaries yet.</p>
+            <p className="text-sm text-gray-700">You don't yet have any video summaries.</p>
           </div>
         )}
         {videos.map((video) => {
