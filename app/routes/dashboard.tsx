@@ -6,8 +6,6 @@ import { useCallback, useEffect, useRef } from "react";
 import { SupabaseOutletContext } from "~/root";
 import { createSupabaseServerClient } from "~/supabase.server";
 
-const { MY_SUPABASE_URL } = process.env;
-
 type Video = {
   id: string;
   user_id: string;

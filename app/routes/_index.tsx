@@ -14,8 +14,9 @@ export default function Index() {
       <h1 className="text-3xl font-bold">
         Coshmu
       </h1>
-      <Link to="/dashboard" className="mt-4 px-2.5 py-1 bg-gray-100 rounded-md text-sm">
-        Go to Dashboard
+
+      <Link to="/sign-in" className="mt-4 px-2.5 py-1 bg-gray-100 rounded-md text-sm">
+        Sign in
       </Link>
     </div>
   );
