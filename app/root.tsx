@@ -45,8 +45,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export const loader = async ({}: LoaderFunctionArgs) => {
   return json({
     env: {
-      SUPABASE_URL: process.env.SUPABASE_URL!,
-      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+      MY_SUPABASE_URL: process.env.MY_SUPABASE_URL!,
+      MY_SUPABASE_ANON_KEY: process.env.MY_SUPABASE_ANON_KEY!,
     },
   });
 };
@@ -54,7 +54,8 @@ export const loader = async ({}: LoaderFunctionArgs) => {
 export default function App() {
   const { env } = useLoaderData<typeof loader>();
   const [supabase] = useState(() => createBrowserClient(
-    env.SUPABASE_URL, env.SUPABASE_ANON_KEY
+    env.MY_SUPABASE_URL,
+    env.MY_SUPABASE_ANON_KEY
   ));
 
   return (
