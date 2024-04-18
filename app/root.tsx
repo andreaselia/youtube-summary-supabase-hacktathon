@@ -18,6 +18,8 @@ type TypedSupabaseClient = SupabaseClient<any>;
 
 export type SupabaseOutletContext = {
   supabase: TypedSupabaseClient;
+  activeAudioVideoId: string | null;
+  setActiveAudioVideoId: (id: string | null) => void;
 };
 
 export const links: LinksFunction = () => [
@@ -57,8 +59,13 @@ export default function App() {
     env.MY_SUPABASE_URL,
     env.MY_SUPABASE_ANON_KEY
   ));
+  const [activeAudioVideoId, setActiveAudioVideoId] = useState(null);
 
+  console.log('activeAudioVideoId', activeAudioVideoId)
   return (
-    <Outlet context={{ supabase }} />
+    <>
+      <Outlet context={{ supabase, activeAudioVideoId, setActiveAudioVideoId }} />
+      <div>foo: {activeAudioVideoId}</div>
+    </>
   );
 }

@@ -76,7 +76,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Dashboard() {
-  const { supabase } = useOutletContext<SupabaseOutletContext>();
+  const { supabase, setActiveAudioVideoId } = useOutletContext<SupabaseOutletContext>();
   const actionResponse = useActionData<typeof action>();
   const formRef = useRef<HTMLFormElement>(null);
   const videos: Video[] = useLoaderData();
@@ -128,6 +128,7 @@ export default function Dashboard() {
 
   return (
     <div className="py-8 md:py-16 mx-auto w-full max-w-screen-sm">
+      <button type="button" onClick={() => setActiveAudioVideoId('1123213')}>activeAudioVideoId</button>
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">
           Videos
@@ -196,7 +197,7 @@ export default function Dashboard() {
                 dangerouslySetInnerHTML={{ __html: video.title }}
               />
 
-              <audio src={`${MY_SUPABASE_URL}/storage/v1/object/public/tts/${video.id}.mp3`} controls />
+              {/* <audio src={`${MY_SUPABASE_URL}/storage/v1/object/public/tts/${video.id}.mp3`} controls /> */}
 
               <div className="mt-2 flex items-center justify-between">
                 <div className="flex space-x-4">

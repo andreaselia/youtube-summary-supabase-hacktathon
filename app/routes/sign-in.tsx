@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
+import { Form, useActionData, useNavigation } from "@remix-run/react";
 import { useEffect, useRef } from "react";
 
 import { createSupabaseServerClient } from "~/supabase.server";
@@ -49,6 +49,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function SignIn() {
   const actionResponse = useActionData<typeof action>();
+  const { state } = useNavigation();
+  const busy = state === "submitting";
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -85,7 +87,8 @@ export default function SignIn() {
             />
             <button
               type="submit"
-              className="mt-2 w-full bg-sky-500 hover:bg-sky-700 px-5 py-2.5 text-sm leading-5 rounded-md font-semibold text-white"
+              className="mt-2 w-full bg-sky-500 hover:bg-sky-700 px-5 py-2.5 text-sm leading-5 rounded-md font-semibold text-white disabled:bg-slate-200 disabled:text-slate-500 disabled:cursor-not-allowed disabled:hover:bg-slate-200 disabled:hover:text-slate-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+              disabled={busy}
             >
               Sign in
             </button>
