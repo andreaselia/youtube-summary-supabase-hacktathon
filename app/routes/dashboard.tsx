@@ -15,7 +15,7 @@ type Video = {
   duration: string;
   channel: string;
   published_at: string;
-  current_state: 'pending' | 'active' | 'failed';
+  current_state: "pending" | "active" | "failed";
 };
 
 export const meta: MetaFunction = () => {
@@ -43,7 +43,14 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     return json([], { headers });
   }
 
-  return json(videos, { headers });
+  return json({
+    videos,
+    env: {
+      MY_SUPABASE_URL: process.env.MY_SUPABASE_URL!,
+    },
+  }, {
+    headers,
+  });
 };
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -76,8 +83,8 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function Dashboard() {
   const { supabase } = useOutletContext<SupabaseOutletContext>();
   const actionResponse = useActionData<typeof action>();
+  const { videos, env }: any = useLoaderData<typeof loader>();
   const formRef = useRef<HTMLFormElement>(null);
-  const videos: Video[] = useLoaderData();
   const revalidator = useRevalidator();
 
   useEffect(() => {
@@ -111,7 +118,7 @@ export default function Dashboard() {
     const minutes = matches?.[2] ? parseInt(matches[2]) : 0;
     const seconds = matches?.[3] ? parseInt(matches[3]) : 0;
 
-    const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    const formattedDuration = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
     return formattedDuration;
   }, []);
@@ -123,6 +130,18 @@ export default function Dashboard() {
       year: "numeric",
     });
   }, []);
+
+  const playAudio = (video: Video) => {
+    const audioPlayer = document.getElementById(`audio-${video.id}`) as HTMLAudioElement;
+
+    audioPlayer.play();
+  };
+
+  const pauseAudio = (video: Video) => {
+    const audioPlayer = document.getElementById(`audio-${video.id}`) as HTMLAudioElement;
+
+    audioPlayer.pause();
+  };
 
   return (
     <div className="py-8 md:py-16 mx-auto w-full max-w-screen-sm">
@@ -194,7 +213,12 @@ export default function Dashboard() {
                 dangerouslySetInnerHTML={{ __html: video.title }}
               />
 
-              {/* <audio src={`${MY_SUPABASE_URL}/storage/v1/object/public/tts/${video.id}.mp3`} controls /> */}
+              {video.transcribed_at && (
+                <audio
+                  id={`audio-${video.id}`}
+                  src={`${env.MY_SUPABASE_URL}/storage/v1/object/public/tts/${video.id}.mp3`}
+                />
+              )}
 
               <div className="mt-2 flex items-center justify-between">
                 <div className="flex space-x-4">
@@ -224,20 +248,47 @@ export default function Dashboard() {
                     {getReadablePublishedAt(video.published_at)}
                   </span>
                 </div>
-                <Form action="/delete-video" method="post">
-                  <input type="hidden" name="video_id" value={video.id} />
-                  <button
-                    type="submit"
-                    className="text-red-700 text-xs inline-flex items-center gap-x-1 hover:underline"
-                  >
-                    <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
-                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6.75 7.75L7.59115 17.4233C7.68102 18.4568 8.54622 19.25 9.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75" />
-                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.75 7.5V6.75C9.75 5.64543 10.6454 4.75 11.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.5" />
-                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 7.75H19" />
-                    </svg>
-                    Delete
-                  </button>
-                </Form>
+                <div className="flex items-center space-x-4">
+                  {video.transcribed_at && (
+                    <>
+                      <button
+                        type="button"
+                        className="text-xs inline-flex items-center gap-x-1 hover:underline"
+                        onClick={() => playAudio(video)}
+                      >
+                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
+                          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M18.25 12L5.75 5.75V18.25L18.25 12Z" />
+                        </svg>
+                        Play Audio
+                      </button>
+                      <button
+                        type="button"
+                        className="text-xs inline-flex items-center gap-x-1 hover:underline"
+                        onClick={() => pauseAudio(video)}
+                      >
+                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
+                          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.25 6.75V17.25"></path>
+                          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8.75 6.75V17.25"></path>
+                        </svg>
+                        Pause Audio
+                      </button>
+                    </>
+                  )}
+                  <Form action="/delete-video" method="post">
+                    <input type="hidden" name="video_id" value={video.id} />
+                    <button
+                      type="submit"
+                      className="text-red-700 text-xs inline-flex items-center gap-x-1 hover:underline"
+                    >
+                      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6.75 7.75L7.59115 17.4233C7.68102 18.4568 8.54622 19.25 9.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75" />
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.75 7.5V6.75C9.75 5.64543 10.6454 4.75 11.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.5" />
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 7.75H19" />
+                      </svg>
+                      Delete
+                    </button>
+                  </Form>
+                </div>
               </div>
             </div>
           );

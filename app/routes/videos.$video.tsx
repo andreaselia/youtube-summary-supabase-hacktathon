@@ -59,7 +59,7 @@ export default function Dashboard() {
     const minutes = matches?.[2] ? parseInt(matches[2]) : 0;
     const seconds = matches?.[3] ? parseInt(matches[3]) : 0;
 
-    const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    const formattedDuration = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
     return formattedDuration;
   }, []);

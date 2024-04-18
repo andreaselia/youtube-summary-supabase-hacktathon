@@ -1,9 +1,6 @@
 import { createServerClient, parse, serialize } from "@supabase/ssr";
 
-const {
-  MY_SUPABASE_URL,
-  MY_SUPABASE_ANON_KEY,
-} = process.env;
+const { MY_SUPABASE_URL, MY_SUPABASE_ANON_KEY } = process.env;
 
 export const createSupabaseServerClient = (request: Request) => {
   const cookies = parse(request.headers.get("Cookie") ?? "");
