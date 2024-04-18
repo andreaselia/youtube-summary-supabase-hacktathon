@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, Link, useActionData, useLoaderData, useOutletContext } from "@remix-run/react";
+import { Form, Link, useActionData, useLoaderData, useOutletContext, useRevalidator } from "@remix-run/react";
 import { useCallback, useEffect, useRef } from "react";
 
 import { SupabaseOutletContext } from "~/root";
@@ -78,12 +78,32 @@ export default function Dashboard() {
   const actionResponse = useActionData<typeof action>();
   const formRef = useRef<HTMLFormElement>(null);
   const videos: Video[] = useLoaderData();
+  const revalidator = useRevalidator();
 
   useEffect(() => {
     if (actionResponse?.success) {
       formRef.current?.reset();
     }
   }, [actionResponse]);
+
+  useEffect(() => {
+    const subscription = supabase
+      .channel("videos")
+      .on("postgres_changes", {
+        event: "UPDATE",
+        schema: "public",
+        table: "videos",
+      }, (payload) => {
+        console.log("Change received!", payload);
+
+        revalidator.revalidate();
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    }
+  }, [supabase]);
 
   const getReadableDuration = useCallback((duration: string) => {
     const matches = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
