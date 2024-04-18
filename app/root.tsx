@@ -13,13 +13,12 @@ import { createBrowserClient } from "@supabase/ssr";
 import { useState } from "react";
 import { SupabaseClient } from "@supabase/supabase-js";
 
-// TODO: replace `any` with the database type
-type TypedSupabaseClient = SupabaseClient<any>;
+import { Database } from "~/types/database";
+
+type TypedSupabaseClient = SupabaseClient<Database>;
 
 export type SupabaseOutletContext = {
   supabase: TypedSupabaseClient;
-  activeAudioVideoId: string | null;
-  setActiveAudioVideoId: (id: string | null) => void;
 };
 
 export const links: LinksFunction = () => [
@@ -59,13 +58,8 @@ export default function App() {
     env.MY_SUPABASE_URL,
     env.MY_SUPABASE_ANON_KEY
   ));
-  const [activeAudioVideoId, setActiveAudioVideoId] = useState(null);
 
-  console.log('activeAudioVideoId', activeAudioVideoId)
   return (
-    <>
-      <Outlet context={{ supabase, activeAudioVideoId, setActiveAudioVideoId }} />
-      <div>foo: {activeAudioVideoId}</div>
-    </>
+    <Outlet context={{ supabase }} />
   );
 }
