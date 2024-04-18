@@ -1,8 +1,9 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
+import { Form, Link, useActionData, useLoaderData, useOutletContext, useRevalidator } from "@remix-run/react";
 import { useCallback, useEffect, useRef } from "react";
 
+import { SupabaseOutletContext } from "~/root";
 import { createSupabaseServerClient } from "~/supabase.server";
 
 const { MY_SUPABASE_URL } = process.env;
@@ -21,8 +22,8 @@ type Video = {
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
+    { title: "Coshmu" },
+    { name: "description", content: "The YouTube summarizer you never knew you needed!" },
   ];
 };
 
@@ -75,15 +76,36 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Dashboard() {
+  const { supabase } = useOutletContext<SupabaseOutletContext>();
   const actionResponse = useActionData<typeof action>();
   const formRef = useRef<HTMLFormElement>(null);
   const videos: Video[] = useLoaderData();
+  const revalidator = useRevalidator();
 
   useEffect(() => {
     if (actionResponse?.success) {
       formRef.current?.reset();
     }
   }, [actionResponse]);
+
+  useEffect(() => {
+    const subscription = supabase
+      .channel("videos")
+      .on("postgres_changes", {
+        event: "UPDATE",
+        schema: "public",
+        table: "videos",
+      }, (payload) => {
+        console.log("Change received!", payload);
+
+        revalidator.revalidate();
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    }
+  }, [supabase]);
 
   const getReadableDuration = useCallback((duration: string) => {
     const matches = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
@@ -211,9 +233,9 @@ export default function Dashboard() {
                     className="text-red-700 text-xs inline-flex items-center gap-x-1 hover:underline"
                   >
                     <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
-                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75L7.59115 17.4233C7.68102 18.4568 8.54622 19.25 9.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75"></path>
-                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 7.5V6.75C9.75 5.64543 10.6454 4.75 11.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.5"></path>
-                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 7.75H19"></path>
+                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6.75 7.75L7.59115 17.4233C7.68102 18.4568 8.54622 19.25 9.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75" />
+                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.75 7.5V6.75C9.75 5.64543 10.6454 4.75 11.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.5" />
+                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 7.75H19" />
                     </svg>
                     Delete
                   </button>
