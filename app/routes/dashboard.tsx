@@ -1,8 +1,9 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
+import { Form, Link, useActionData, useLoaderData, useOutletContext } from "@remix-run/react";
 import { useCallback, useEffect, useRef } from "react";
 
+import { SupabaseOutletContext } from "~/root";
 import { createSupabaseServerClient } from "~/supabase.server";
 
 type Video = {
@@ -73,6 +74,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Dashboard() {
+  const { supabase } = useOutletContext<SupabaseOutletContext>();
   const actionResponse = useActionData<typeof action>();
   const formRef = useRef<HTMLFormElement>(null);
   const videos: Video[] = useLoaderData();
