@@ -2,21 +2,10 @@ import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remi
 import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData, useOutletContext, useRevalidator } from "@remix-run/react";
 import { useCallback, useEffect, useRef } from "react";
+import { VideoPlayer } from "~/components/video-player";
 
 import { SupabaseOutletContext } from "~/root";
 import { createSupabaseServerClient } from "~/supabase.server";
-
-type Video = {
-  id: string;
-  user_id: string;
-  youtube_url: string;
-  title: string;
-  content: string;
-  duration: string;
-  channel: string;
-  published_at: string;
-  current_state: "pending" | "active" | "failed";
-};
 
 export const meta: MetaFunction = () => {
   return [
@@ -131,24 +120,6 @@ export default function Dashboard() {
     });
   }, []);
 
-  const playAudio = (video: Video) => {
-    const audioPlayer = document.getElementById(`audio-${video.id}`) as HTMLAudioElement;
-
-    audioPlayer.play();
-  };
-
-  const pauseAudio = (video: Video) => {
-    const audioPlayer = document.getElementById(`audio-${video.id}`) as HTMLAudioElement;
-
-    audioPlayer.pause();
-  };
-
-  const isAudioPlaying = (video: Video): boolean => {
-    const audioPlayer = document.getElementById(`audio-${video.id}`) as HTMLAudioElement;
-
-    return audioPlayer.paused;
-  };
-
   return (
     <div className="py-8 md:py-16 mx-auto w-full max-w-screen-sm">
       <div className="flex items-center justify-between">
@@ -219,13 +190,6 @@ export default function Dashboard() {
                 dangerouslySetInnerHTML={{ __html: video.title }}
               />
 
-              {video.transcribed_at && (
-                <audio
-                  id={`audio-${video.id}`}
-                  src={`${env.MY_SUPABASE_URL}/storage/v1/object/public/tts/${video.id}.mp3`}
-                />
-              )}
-
               <div className="mt-2 flex items-center justify-between">
                 <div className="flex space-x-4">
                   <span className="text-gray-800 text-xs inline-flex items-center gap-x-1">
@@ -256,33 +220,12 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center space-x-4">
                   {video.transcribed_at && (
-                    <>
-                      {isAudioPlaying(video) ? (
-                        <button
-                          type="button"
-                          className="text-xs inline-flex items-center gap-x-1 hover:underline"
-                          onClick={() => pauseAudio(video)}
-                        >
-                          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
-                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.25 6.75V17.25"></path>
-                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8.75 6.75V17.25"></path>
-                          </svg>
-                          Pause Audio
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="text-xs inline-flex items-center gap-x-1 hover:underline"
-                          onClick={() => playAudio(video)}
-                        >
-                          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
-                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M18.25 12L5.75 5.75V18.25L18.25 12Z" />
-                          </svg>
-                          Play Audio
-                        </button>
-                      )}
-                    </>
+                    <VideoPlayer
+                      url={env.MY_SUPABASE_URL}
+                      videoId={video.id}
+                    />
                   )}
+
                   <Form action="/delete-video" method="post">
                     <input type="hidden" name="video_id" value={video.id} />
                     <button
