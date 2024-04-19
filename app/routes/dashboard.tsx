@@ -143,6 +143,12 @@ export default function Dashboard() {
     audioPlayer.pause();
   };
 
+  const isAudioPlaying = (video: Video): boolean => {
+    const audioPlayer = document.getElementById(`audio-${video.id}`) as HTMLAudioElement;
+
+    return audioPlayer.paused;
+  };
+
   return (
     <div className="py-8 md:py-16 mx-auto w-full max-w-screen-sm">
       <div className="flex items-center justify-between">
@@ -251,27 +257,30 @@ export default function Dashboard() {
                 <div className="flex items-center space-x-4">
                   {video.transcribed_at && (
                     <>
-                      <button
-                        type="button"
-                        className="text-xs inline-flex items-center gap-x-1 hover:underline"
-                        onClick={() => playAudio(video)}
-                      >
-                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
-                          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M18.25 12L5.75 5.75V18.25L18.25 12Z" />
-                        </svg>
-                        Play Audio
-                      </button>
-                      <button
-                        type="button"
-                        className="text-xs inline-flex items-center gap-x-1 hover:underline"
-                        onClick={() => pauseAudio(video)}
-                      >
-                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
-                          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.25 6.75V17.25"></path>
-                          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8.75 6.75V17.25"></path>
-                        </svg>
-                        Pause Audio
-                      </button>
+                      {isAudioPlaying(video) ? (
+                        <button
+                          type="button"
+                          className="text-xs inline-flex items-center gap-x-1 hover:underline"
+                          onClick={() => pauseAudio(video)}
+                        >
+                          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
+                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.25 6.75V17.25"></path>
+                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8.75 6.75V17.25"></path>
+                          </svg>
+                          Pause Audio
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="text-xs inline-flex items-center gap-x-1 hover:underline"
+                          onClick={() => playAudio(video)}
+                        >
+                          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
+                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M18.25 12L5.75 5.75V18.25L18.25 12Z" />
+                          </svg>
+                          Play Audio
+                        </button>
+                      )}
                     </>
                   )}
                   <Form action="/delete-video" method="post">
