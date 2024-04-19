@@ -12,16 +12,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return redirect("/");
   }
 
-  const form = await request.formData();
-  const videoId = form.get("video_id");
+  const formData = await request.formData();
+  const videoId = formData.get("video_id");
 
-  const { error } = await supabaseClient.from("videos").delete().eq("id", videoId);
-
-  if (error) {
-    return redirect("/dashboard", {
-      headers,
-    });
-  }
+  await supabaseClient.from("videos").delete().eq("id", videoId);
 
   return redirect("/dashboard", {
     headers,

@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { useEffect, useState } from "react";
 import { ClientOnly } from "remix-utils/client-only";
 
 export type Video = {
@@ -13,8 +13,20 @@ export type Video = {
   current_state: "pending" | "active" | "failed";
 };
 
-export function VideoPlayer({ url, videoId }: { url: string; videoId: string }) {
+export function VideoPlayer({ url, videoId, disableAudio, onPlay }: { url: string; videoId: string; disableAudio: boolean; onPlay: (videoId: string) => void }) {
   const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    if (disableAudio) {
+      setIsPlaying(false);
+
+      if (typeof document !== "undefined") {
+        return;
+      }
+
+      pauseAudio();
+    }
+  }, [disableAudio]);
 
   const playAudio = () => {
     const audioPlayer = document.getElementById(`audio-${videoId}`) as HTMLAudioElement;
@@ -22,6 +34,8 @@ export function VideoPlayer({ url, videoId }: { url: string; videoId: string }) 
     audioPlayer.play();
 
     setIsPlaying(true);
+
+    onPlay(videoId);
   };
 
   const pauseAudio = () => {
@@ -32,14 +46,20 @@ export function VideoPlayer({ url, videoId }: { url: string; videoId: string }) 
     setIsPlaying(false);
   };
 
-  const isAudioPlaying = () => {
-    const audioPlayer = document.getElementById(`audio-${videoId}`) as HTMLAudioElement;
-
-    setIsPlaying(!audioPlayer.paused);
-  };
-
   return (
-    <ClientOnly>
+    <ClientOnly
+      fallback={
+        <button
+          type="button"
+          className="text-xs inline-flex items-center gap-x-1 hover:underline disabled:opacity-50"
+        >
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
+            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M18.25 12L5.75 5.75V18.25L18.25 12Z" />
+          </svg>
+          Play Audio
+        </button>
+      }
+    >
       {() => (
         <>
           <audio

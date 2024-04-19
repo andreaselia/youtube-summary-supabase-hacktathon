@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData, useOutletContext, useRevalidator } from "@remix-run/react";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { VideoPlayer } from "~/components/video-player";
 
 import { SupabaseOutletContext } from "~/root";
@@ -23,17 +23,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     return redirect("/sign-in");
   }
 
-  const { data: videos, error } = await supabaseClient
+  const { data: videos } = await supabaseClient
     .from("videos")
-    .select("*")
+    .select()
     .neq("current_state", "failed");
 
-  if (error) {
-    return json([], { headers });
-  }
-
   return json({
-    videos,
+    videos: videos || [],
     env: {
       MY_SUPABASE_URL: process.env.MY_SUPABASE_URL!,
     },
@@ -72,7 +68,8 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function Dashboard() {
   const { supabase } = useOutletContext<SupabaseOutletContext>();
   const actionResponse = useActionData<typeof action>();
-  const { videos, env }: any = useLoaderData<typeof loader>();
+  const { videos, env } = useLoaderData<typeof loader>();
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const revalidator = useRevalidator();
 
@@ -223,6 +220,8 @@ export default function Dashboard() {
                     <VideoPlayer
                       url={env.MY_SUPABASE_URL}
                       videoId={video.id}
+                      disableAudio={video.id !== selectedVideoId}
+                      onPlay={(videoId: string) => setSelectedVideoId(videoId)}
                     />
                   )}
 
