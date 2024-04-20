@@ -15,7 +15,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const videoId = formData.get("video_id");
 
-  await supabaseClient.from("videos").delete().eq("id", videoId);
+  console.log(`Synthesizing video ${videoId}...`);
+
+  await supabaseClient
+    .from("videos")
+    .update({ current_state: "synthesizing" })
+    .eq("id", videoId);
 
   return redirect("/dashboard", {
     headers,

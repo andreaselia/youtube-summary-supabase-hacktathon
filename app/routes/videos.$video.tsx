@@ -59,7 +59,7 @@ export default function Dashboard() {
     const minutes = matches?.[2] ? parseInt(matches[2]) : 0;
     const seconds = matches?.[3] ? parseInt(matches[3]) : 0;
 
-    const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    const formattedDuration = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
     return formattedDuration;
   }, []);
@@ -74,12 +74,10 @@ export default function Dashboard() {
 
   return (
     <div className="py-8 md:py-16 mx-auto w-full max-w-screen-sm">
-      <div className="prose">
-        <h1
-          dangerouslySetInnerHTML={{ __html: loaderResponse.title }}
-          className="mb-4"
-        />
-      </div>
+      <h1
+        dangerouslySetInnerHTML={{ __html: loaderResponse.title }}
+        className="text-3xl font-bold"
+      />
 
       <div className="mt-8 grid grid-cols-4 gap-x-4">
         <p className="flex-auto py-0.5 text-sm leading-5 text-gray-500 flex flex-col items-center">

@@ -13,8 +13,9 @@ import { createBrowserClient } from "@supabase/ssr";
 import { useState } from "react";
 import { SupabaseClient } from "@supabase/supabase-js";
 
-// TODO: replace `any` with the database type
-type TypedSupabaseClient = SupabaseClient<any>;
+import { Database } from "~/types/database";
+
+type TypedSupabaseClient = SupabaseClient<Database>;
 
 export type SupabaseOutletContext = {
   supabase: TypedSupabaseClient;

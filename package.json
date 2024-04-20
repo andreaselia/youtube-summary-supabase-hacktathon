@@ -8,6 +8,7 @@
     "dev": "remix vite:dev",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/server/index.js",
+    "typegen": "supabase gen types typescript --local > app/types/database.ts",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -22,6 +23,7 @@
     "openai": "^4.34.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "remix-utils": "^7.6.0",
     "striptags": "^3.2.0"
   },
   "devDependencies": {

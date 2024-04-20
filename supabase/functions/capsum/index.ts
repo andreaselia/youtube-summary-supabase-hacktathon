@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
 
   const { video } = await req.json()
 
-  console.log(`Transcribing video ${video.id}...`)
+  console.log(`Capsumming video ${video.id}...`)
 
   try {
     // eslint-disable-next-line no-useless-escape
@@ -54,6 +54,10 @@ Deno.serve(async (req) => {
 
     const subtitlesSummary = chatCompletion.choices[0].message.content
 
+    if (!subtitlesSummary) {
+      throw new Error("No summary generated")
+    }
+
     console.log("Captions found")
 
     await supabaseClient
@@ -79,7 +83,6 @@ Deno.serve(async (req) => {
       .from("videos")
       .update({ current_state: "failed" })
       .eq("id", video.id)
-      .throwOnError()
 
     return new Response(
       JSON.stringify({

@@ -1,22 +1,11 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData, useOutletContext, useRevalidator } from "@remix-run/react";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { VideoPlayer } from "~/components/video-player";
 
 import { SupabaseOutletContext } from "~/root";
 import { createSupabaseServerClient } from "~/supabase.server";
-
-type Video = {
-  id: string;
-  user_id: string;
-  youtube_url: string;
-  title: string;
-  content: string;
-  duration: string;
-  channel: string;
-  published_at: string;
-  current_state: 'pending' | 'active' | 'failed';
-};
 
 export const meta: MetaFunction = () => {
   return [
@@ -34,16 +23,19 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     return redirect("/sign-in");
   }
 
-  const { data: videos, error } = await supabaseClient
+  const { data: videos } = await supabaseClient
     .from("videos")
-    .select("*")
+    .select()
     .neq("current_state", "failed");
 
-  if (error) {
-    return json([], { headers });
-  }
-
-  return json(videos, { headers });
+  return json({
+    videos: videos || [],
+    env: {
+      MY_SUPABASE_URL: process.env.MY_SUPABASE_URL!,
+    },
+  }, {
+    headers,
+  });
 };
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -76,8 +68,9 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function Dashboard() {
   const { supabase } = useOutletContext<SupabaseOutletContext>();
   const actionResponse = useActionData<typeof action>();
+  const { videos, env } = useLoaderData<typeof loader>();
+  const [playingVideoId, setPlayingVideoId] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
-  const videos: Video[] = useLoaderData();
   const revalidator = useRevalidator();
 
   useEffect(() => {
@@ -111,7 +104,7 @@ export default function Dashboard() {
     const minutes = matches?.[2] ? parseInt(matches[2]) : 0;
     const seconds = matches?.[3] ? parseInt(matches[3]) : 0;
 
-    const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    const formattedDuration = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
     return formattedDuration;
   }, []);
@@ -222,20 +215,60 @@ export default function Dashboard() {
                     {getReadablePublishedAt(video.published_at)}
                   </span>
                 </div>
-                <Form action="/delete-video" method="post">
-                  <input type="hidden" name="video_id" value={video.id} />
-                  <button
-                    type="submit"
-                    className="text-red-700 text-xs inline-flex items-center gap-x-1 hover:underline"
-                  >
-                    <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
-                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6.75 7.75L7.59115 17.4233C7.68102 18.4568 8.54622 19.25 9.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75" />
-                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.75 7.5V6.75C9.75 5.64543 10.6454 4.75 11.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.5" />
-                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 7.75H19" />
-                    </svg>
-                    Delete
-                  </button>
-                </Form>
+                <div className="flex items-center space-x-4">
+                  {video.synthesized_at ? (
+                    <VideoPlayer
+                      url={env.MY_SUPABASE_URL}
+                      videoId={video.id}
+                      playingVideoId={playingVideoId}
+                      setPlayingVideoId={setPlayingVideoId}
+                    />
+                  ) : (
+                    <>
+                      {video.current_state === "synthesizing" ? (
+                        <button
+                          type="button"
+                          className="text-xs inline-flex items-center gap-x-1.5 text-gray-700"
+                        >
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 animate-spin">
+                            <path d="M11.25 14.75L8.75 17M8.75 17L11.25 19.25M8.75 17H13.25C16.5637 17 19.25 14.3137 19.25 11V10.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M15.25 7H10.75C7.43629 7 4.75 9.68629 4.75 13V13.25M15.25 7L12.75 9.25M15.25 7L12.75 4.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                          Synthesizing...
+                        </button>
+                      ) : (
+                        <Form action="/synthesize" method="post">
+                          <input type="hidden" name="video_id" value={video.id} />
+                          <button
+                            type="submit"
+                            className="text-xs inline-flex items-center gap-x-1 hover:underline"
+                          >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4">
+                              <path d="M11.25 14.75L8.75 17M8.75 17L11.25 19.25M8.75 17H13.25C16.5637 17 19.25 14.3137 19.25 11V10.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              <path d="M15.25 7H10.75C7.43629 7 4.75 9.68629 4.75 13V13.25M15.25 7L12.75 9.25M15.25 7L12.75 4.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            Generate Audio
+                          </button>
+                        </Form>
+                      )}
+                    </>
+                  )}
+
+                  <Form action="/delete-video" method="post">
+                    <input type="hidden" name="video_id" value={video.id} />
+                    <button
+                      type="submit"
+                      className="text-red-700 text-xs inline-flex items-center gap-x-1 hover:underline"
+                    >
+                      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6.75 7.75L7.59115 17.4233C7.68102 18.4568 8.54622 19.25 9.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75" />
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.75 7.5V6.75C9.75 5.64543 10.6454 4.75 11.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.5" />
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 7.75H19" />
+                      </svg>
+                      Delete
+                    </button>
+                  </Form>
+                </div>
               </div>
             </div>
           );
