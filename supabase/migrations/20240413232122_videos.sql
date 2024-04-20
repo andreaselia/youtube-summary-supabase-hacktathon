@@ -31,6 +31,7 @@ create table videos (
   duration text,
   channel text,
   channel_url text,
+  failed_reason text,
   published_at timestamp with time zone,
   synthesized_at timestamp with time zone,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,

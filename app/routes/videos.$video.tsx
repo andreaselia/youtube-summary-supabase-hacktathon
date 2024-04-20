@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 
 import { parseMarkdown } from "~/services/markdown.server";
 import { Markdown } from "~/components/markdown";
@@ -74,9 +74,17 @@ export default function Dashboard() {
 
   return (
     <div className="py-8 md:py-16 mx-auto w-full max-w-screen-sm">
+      <Link to="/dashboard" className="inline-flex items-center text-xs hover:underline">
+        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4 mr-1">
+          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10.25 6.75L4.75 12L10.25 17.25" />
+          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19.25 12H5" />
+        </svg>
+        Back to All Videos
+      </Link>
+
       <h1
         dangerouslySetInnerHTML={{ __html: loaderResponse.title }}
-        className="text-3xl font-bold"
+        className="mt-10 text-3xl font-bold"
       />
 
       <div className="mt-8 grid grid-cols-4 gap-x-4">

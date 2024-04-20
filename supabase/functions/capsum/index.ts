@@ -92,7 +92,10 @@ Deno.serve(async (req) => {
 
     await supabaseClient
       .from("videos")
-      .update({ current_state: "failed" })
+      .update({
+        current_state: "failed",
+        failed_reason: error.message,
+      })
       .eq("id", video.id)
 
     return new Response(
