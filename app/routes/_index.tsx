@@ -16,7 +16,7 @@ export default function Index() {
       </h1>
 
       <Link to="/sign-in" className="mt-4 px-2.5 py-1 bg-gray-100 rounded-md text-sm">
-        Sign in
+        Get Started
       </Link>
     </div>
   );
