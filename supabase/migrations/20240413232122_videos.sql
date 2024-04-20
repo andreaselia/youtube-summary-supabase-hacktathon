@@ -2,7 +2,7 @@ create type video_state as ENUM (
   'pending',
   'active',
   'failed',
-  'transcribing'
+  'synthesizing'
 );
 
 create extension if not exists http;
@@ -31,7 +31,7 @@ create table videos (
   duration varchar(10),
   channel varchar(100),
   published_at timestamp with time zone,
-  transcribed_at timestamp with time zone,
+  synthesized_at timestamp with time zone,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
@@ -49,11 +49,11 @@ create policy "Individuals can delete their own videos." on videos for
 
 alter publication supabase_realtime add table videos;
 
-create function public.handle_new_video()
+create function public.handle_inserted_video()
 returns trigger as $$
 begin
   perform "net"."http_post"(
-    supabase_url() || '/functions/v1/transcribe'::text,
+    supabase_url() || '/functions/v1/capsum'::text,
     jsonb_build_object(
       'video', to_jsonb(new.*)
     ),
@@ -67,6 +67,39 @@ begin
 end;
 $$ language plpgsql security definer;
 
-create trigger on_video_created
+create trigger on_video_inserted
   after insert on videos
-  for each row execute procedure public.handle_new_video();
+  for each row execute procedure public.handle_inserted_video();
+
+create function public.handle_updated_video()
+returns trigger as $$
+begin
+  if new.current_state is distinct from old.current_state and new.current_state = 'synthesizing' then
+    perform "net"."http_post"(
+      supabase_url() || '/functions/v1/synthesize'::text,
+      jsonb_build_object(
+        'video', to_jsonb(new.*)
+      ),
+      headers := jsonb_build_object(
+        'Content-Type', 'application/json',
+        'Authorization', current_setting('request.headers')::json->>'authorization'
+      )
+    ) as request_id;
+  end if;
+
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_video_updated
+  after update on videos
+  for each row execute procedure public.handle_updated_video();
+
+insert into storage.buckets (id, name)
+values ('tts', 'tts');
+
+create policy "Public access" on storage.objects
+  for select using (bucket_id = 'tts');
+
+create policy "Anyone can upload" on storage.objects
+  for insert with check (bucket_id = 'tts');

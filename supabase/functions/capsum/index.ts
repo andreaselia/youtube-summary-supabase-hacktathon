@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
 
   const { video } = await req.json()
 
-  console.log(`Transcribing video ${video.id}...`)
+  console.log(`Capsumming video ${video.id}...`)
 
   try {
     // eslint-disable-next-line no-useless-escape
@@ -70,19 +70,6 @@ Deno.serve(async (req) => {
       .eq("id", video.id)
       .throwOnError()
 
-    const tts = await openai.audio.speech.create({
-      model: "tts-1",
-      voice: "nova",
-      input: subtitlesSummary,
-    })
-
-    const arrayBuffer = await tts.arrayBuffer()
-    const uint8Array = new Uint8Array(arrayBuffer)
-
-    await supabaseClient.storage
-      .from("tts")
-      .upload(`${video.id}.mp3`, uint8Array)
-
     return new Response(
       JSON.stringify({
         success: true,
@@ -96,7 +83,6 @@ Deno.serve(async (req) => {
       .from("videos")
       .update({ current_state: "failed" })
       .eq("id", video.id)
-      .throwOnError()
 
     return new Response(
       JSON.stringify({
