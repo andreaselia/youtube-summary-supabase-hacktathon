@@ -22,8 +22,8 @@ export function VideoPlayer({
 }: {
   url: string;
   videoId: string;
-  playingVideoId: string | null;
-  setPlayingVideoId: (videoId: string) => void;
+  playingVideoId?: string | null;
+  setPlayingVideoId?: (videoId: string) => void;
 }) {
   const ref = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -42,7 +42,10 @@ export function VideoPlayer({
     ref.current.play();
 
     setIsPlaying(true);
-    setPlayingVideoId(videoId);
+
+    if (setPlayingVideoId) {
+      setPlayingVideoId(videoId);
+    }
   };
 
   const pauseAudio = () => {

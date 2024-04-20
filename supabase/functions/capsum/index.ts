@@ -40,6 +40,8 @@ Deno.serve(async (req) => {
         content: `
           Write a short summary of the video captions below.
 
+          Ignore any irrelevant intro/outro messaging, as well as ads/sponsorships and focus on the main content.
+
           Include a section for the summary, followed by a section for Key Points (highlighting the most
           important or interesting points from the video), Analysis (providing insights, opinions, or
           additional context related to the video content), and Keywords (key terms or phrases extracted
