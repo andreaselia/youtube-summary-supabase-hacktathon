@@ -2,8 +2,8 @@ import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remi
 import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData, useOutletContext, useRevalidator } from "@remix-run/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { VideoPlayer } from "~/components/video-player";
 
+import { VideoPlayer } from "~/components/video-player";
 import { SupabaseOutletContext } from "~/root";
 import { createSupabaseServerClient } from "~/supabase.server";
 

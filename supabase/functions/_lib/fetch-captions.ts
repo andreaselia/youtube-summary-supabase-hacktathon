@@ -20,14 +20,17 @@ export const fetchCaptions = async (videoId: string) => {
 
 
   const titleMatch = videoData.match(/<meta name="title" content="([^"]*|[^"]*[^&]quot;[^"]*)">/);
+  const channelMatch = videoData.match(/<meta itemprop="url" content="([^"]+)"\s*>/);
   const durationMatch = videoData.match(/<meta itemprop="duration" content="([^"]+)"\s*>/);
   const datePublishedMatch = videoData.match(/<meta itemprop="datePublished" content="([^"]+)"\s*>/);
 
   console.log("titleMatch", titleMatch);
+  console.log("channelMatch", channelMatch);
   console.log("durationMatch", durationMatch);
   console.log("datePublishedMatch", datePublishedMatch);
 
   const title = titleMatch ? titleMatch[1] : "No title found";
+  const channelUrl = channelMatch ? channelMatch[1] : null;
   const duration = durationMatch ? durationMatch[1] : null;
   const datePublished = datePublishedMatch ? datePublishedMatch[1] : null;
 
@@ -80,6 +83,7 @@ export const fetchCaptions = async (videoId: string) => {
 
   return {
     title,
+    channel_url: channelUrl,
     content: joinedLines,
     duration,
     channel: videoOwner,

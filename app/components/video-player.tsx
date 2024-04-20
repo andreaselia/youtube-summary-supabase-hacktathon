@@ -9,6 +9,7 @@ export type Video = {
   content: string;
   duration: string;
   channel: string;
+  channel_url: string;
   published_at: string;
   current_state: "pending" | "active" | "failed";
 };
