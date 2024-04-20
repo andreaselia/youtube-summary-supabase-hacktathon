@@ -47,11 +47,11 @@ Deno.serve(async (req) => {
           additional context related to the video content), and Keywords (key terms or phrases extracted
           from the video content to provide a quick reference or overview of the main themes discussed).
 
-          Each keyword in the "Keywords" section should be followed by a colon and a sentence elaborating on its significance in the video.
-
-          The keywords should be in the same order as they appear in the video, and the sentences should be concise.
-
-          The keywords and colon should be bold, and the sentences should be in plain text.
+          Each keyword in the "Keywords" section should be followed by a colon and a sentence elaborating
+          on its significance in the video. The keywords should be in the same order as they appear
+          in the video, and the sentences should be concise. The keywords and colon should be bold, and
+          the sentences should be in plain text. Keywords should ideally be one single word, followed by
+          a sentence that explains its relevance to the video content.
 
           Return the summary in markdown format, headings should be H3 and content should be in bullet points.
 
