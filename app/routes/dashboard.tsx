@@ -69,7 +69,7 @@ export default function Dashboard() {
   const { supabase } = useOutletContext<SupabaseOutletContext>();
   const actionResponse = useActionData<typeof action>();
   const { videos, env } = useLoaderData<typeof loader>();
-  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
+  const [playingVideoId, setPlayingVideoId] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
   const revalidator = useRevalidator();
 
@@ -220,8 +220,8 @@ export default function Dashboard() {
                     <VideoPlayer
                       url={env.MY_SUPABASE_URL}
                       videoId={video.id}
-                      disableAudio={video.id !== selectedVideoId}
-                      onPlay={(videoId: string) => setSelectedVideoId(videoId)}
+                      playingVideoId={playingVideoId}
+                      setPlayingVideoId={setPlayingVideoId}
                     />
                   )}
 

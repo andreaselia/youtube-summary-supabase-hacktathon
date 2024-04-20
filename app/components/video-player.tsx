@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ClientOnly } from "remix-utils/client-only";
 
 export type Video = {
@@ -13,35 +13,52 @@ export type Video = {
   current_state: "pending" | "active" | "failed";
 };
 
-export function VideoPlayer({ url, videoId, disableAudio, onPlay }: { url: string; videoId: string; disableAudio: boolean; onPlay: (videoId: string) => void }) {
+export function VideoPlayer({
+  url,
+  videoId,
+  playingVideoId,
+  setPlayingVideoId,
+}: {
+  url: string;
+  videoId: string;
+  playingVideoId: string | null;
+  setPlayingVideoId: (videoId: string) => void;
+}) {
+  const ref = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    if (disableAudio) {
-      setIsPlaying(false);
-
-      if (typeof document !== "undefined") {
-        return;
-      }
-
-      pauseAudio();
+    if (playingVideoId !== videoId) {
+      stopAudio();
     }
-  }, [disableAudio]);
+  }, [playingVideoId, videoId]);
 
   const playAudio = () => {
-    const audioPlayer = document.getElementById(`audio-${videoId}`) as HTMLAudioElement;
+    if (!ref.current) {
+      return;
+    }
 
-    audioPlayer.play();
+    ref.current.play();
 
     setIsPlaying(true);
-
-    onPlay(videoId);
+    setPlayingVideoId(videoId);
   };
 
   const pauseAudio = () => {
-    const audioPlayer = document.getElementById(`audio-${videoId}`) as HTMLAudioElement;
+    if (!ref.current) {
+      return;
+    }
 
-    audioPlayer.pause();
+    ref.current.pause();
+
+    setIsPlaying(false);
+  };
+
+  const stopAudio = () => {
+    if (ref.current) {
+      ref.current.currentTime = 0;
+      ref.current.pause();
+    }
 
     setIsPlaying(false);
   };
@@ -63,7 +80,7 @@ export function VideoPlayer({ url, videoId, disableAudio, onPlay }: { url: strin
       {() => (
         <>
           <audio
-            id={`audio-${videoId}`}
+            ref={ref}
             src={`${url}/storage/v1/object/public/tts/${videoId}.mp3`}
           />
           {isPlaying ? (
