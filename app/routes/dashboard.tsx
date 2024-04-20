@@ -123,6 +123,7 @@ export default function Dashboard() {
         <h1 className="text-3xl font-bold">
           Videos
         </h1>
+
         <Form action="/sign-out" method="post">
           <button
             type="submit"

@@ -15,9 +15,15 @@ export default function Index() {
         Coshmu
       </h1>
 
-      <Link to="/sign-in" className="mt-4 px-2.5 py-1 bg-gray-100 rounded-md text-sm">
-        Get Started
-      </Link>
+      <div className="flex items-center gap-x-2">
+        <Link to="/sign-in" className="mt-4 px-2.5 py-1 bg-gray-100 rounded-md text-sm">
+          Sign in
+        </Link>
+
+        <Link to="/sign-up" className="mt-4 px-2.5 py-1 bg-gray-100 rounded-md text-sm">
+          Sign up
+        </Link>
+      </div>
     </div>
   );
 }
