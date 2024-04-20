@@ -95,8 +95,10 @@ create trigger on_video_updated
   after update on videos
   for each row execute procedure public.handle_updated_video();
 
-insert into storage.buckets (id, name, is_public)
-values ('tts', 'tts', true);
+insert into storage.buckets (id, name, public)
+select 'tts', 'tts', true where not exists (
+  select 1 from storage.buckets where name = 'tts'
+);
 
 create policy "Public access" on storage.objects
   for select using (bucket_id = 'tts');
