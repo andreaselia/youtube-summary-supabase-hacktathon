@@ -39,14 +39,25 @@ Deno.serve(async (req) => {
         role: "user",
         content: `
           Write a short summary of the video captions below.
-          Ignore any intro and outro in the video that may not be relevant.
-          Include a section for the summary of Main Insights, Essential Points, and Keywords.
+
+          Include a section for the summary, followed by a section for Key Points (highlighting the most
+          important or interesting points from the video), Analysis (providing insights, opinions, or
+          additional context related to the video content), and Keywords (key terms or phrases extracted
+          from the video content to provide a quick reference or overview of the main themes discussed).
+
           Each keyword in the "Keywords" section should be followed by a colon and a sentence elaborating on its significance in the video.
+
           The keywords should be in the same order as they appear in the video, and the sentences should be concise.
+
           The keywords and colon should be bold, and the sentences should be in plain text.
+
           Return the summary in markdown format, headings should be H3 and content should be in bullet points.
+
           Headings should not have a colon or period at the end.
-          Captions: ${videoData.content}`,
+
+          Captions:
+
+          ${videoData.content}`,
       }],
       model: "gpt-4-turbo",
       stream: false,
