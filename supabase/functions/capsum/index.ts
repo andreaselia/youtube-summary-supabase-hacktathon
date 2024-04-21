@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
-import OpenAI from "https://deno.land/x/openai@v4.24.0/mod.ts"
+import Anthropic from "npm:@anthropic-ai/sdk"
 
 import { fetchCaptions } from "../_lib/fetch-captions.ts"
 
@@ -12,8 +12,8 @@ Deno.serve(async (req) => {
     { global: { headers: { Authorization: req.headers.get("Authorization")! } } }
   )
 
-  const openai = new OpenAI({
-    apiKey: Deno.env.get("OPENAI_API_KEY")!,
+  const anthropic = new Anthropic({
+    apiKey: Deno.env.get("ANTHROPIC_API_KEY")!,
   })
 
   const { video } = await req.json()
@@ -34,7 +34,8 @@ Deno.serve(async (req) => {
 
     const videoData = await fetchCaptions(videoId)
 
-    const chatCompletion = await openai.chat.completions.create({
+    const message = await anthropic.messages.create({
+      max_tokens: 4096,
       messages: [{
         role: "user",
         content: `
@@ -59,13 +60,13 @@ Deno.serve(async (req) => {
 
           Captions:
 
-          ${videoData.content}`,
+          ${videoData.content}
+        `,
       }],
-      model: "gpt-4-turbo",
-      stream: false,
+      model: 'claude-3-opus-20240229',
     })
 
-    const subtitlesSummary = chatCompletion.choices[0].message.content
+    const subtitlesSummary = message.content[0].text
 
     if (!subtitlesSummary) {
       throw new Error("No summary generated")

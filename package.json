@@ -12,6 +12,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.20.6",
     "@markdoc/markdoc": "^0.4.0",
     "@remix-run/node": "^2.8.1",
     "@remix-run/react": "^2.8.1",
