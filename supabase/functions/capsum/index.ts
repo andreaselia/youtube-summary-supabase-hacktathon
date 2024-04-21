@@ -35,7 +35,7 @@ Deno.serve(async (req) => {
     const videoData = await fetchCaptions(videoId)
 
     const message = await anthropic.messages.create({
-      max_tokens: 4096,
+      max_tokens: 2048,
       messages: [{
         role: "user",
         content: `
