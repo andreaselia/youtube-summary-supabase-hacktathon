@@ -1,13 +1,13 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { useCallback } from "react";
 import { json, redirect } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Form, Link, useLoaderData } from "@remix-run/react";
 
 import { parseMarkdown } from "~/services/markdown.server";
 import { Markdown } from "~/components/markdown";
-
 import { createSupabaseServerClient } from "~/supabase.server";
-import { useCallback } from "react";
 import { VideoPlayer } from "~/components/video-player";
+import VideoGenerator from "~/components/video-generator";
 
 export const meta: MetaFunction = () => {
   return [
@@ -91,13 +91,33 @@ export default function Dashboard() {
           Back to All Videos
         </Link>
 
-        <div>
-          {video.synthesized_at && (
+        <div className="flex items-center space-x-4">
+          {video.synthesized_at ? (
             <VideoPlayer
               url={env.MY_SUPABASE_URL}
               videoId={video.id}
             />
+          ) : (
+            <VideoGenerator
+              videoId={video.id}
+              videoState={video.current_state}
+            />
           )}
+
+          <Form action="/delete-video" method="post" className="inline-flex">
+            <input type="hidden" name="video_id" value={video.id} />
+            <button
+              type="submit"
+              className="text-red-700 text-xs inline-flex items-center gap-x-1 hover:underline"
+            >
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6.75 7.75L7.59115 17.4233C7.68102 18.4568 8.54622 19.25 9.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75" />
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.75 7.5V6.75C9.75 5.64543 10.6454 4.75 11.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.5" />
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 7.75H19" />
+              </svg>
+              Delete
+            </button>
+          </Form>
         </div>
       </div>
 
