@@ -1,6 +1,6 @@
-# Welcome to Remix + Vite!
+# Coshmu
 
-📖 See the [Remix docs](https://remix.run/docs) and the [Remix Vite docs](https://remix.run/docs/en/main/future/vite) for details on supported features.
+A very easy to use YouTube video summariser, built for speed and usability.
 
 ## Development
 
