@@ -2,6 +2,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remi
 import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData, useOutletContext, useRevalidator } from "@remix-run/react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import DeleteVideoForm from "~/components/delete-video-form";
 
 import VideoGenerator from "~/components/video-generator";
 import { VideoPlayer } from "~/components/video-player";
@@ -26,8 +27,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   const { data: videos } = await supabaseClient
     .from("videos")
-    .select()
-    .neq("current_state", "failed");
+    .select();
 
   return json({
     videos: videos || [],
@@ -183,6 +183,20 @@ export default function Dashboard() {
             );
           }
 
+          if (video.current_state === "failed") {
+            return (
+              <div
+                key={video.id}
+                className="p-5 flex flex-col rounded-lg border shadow-sm border-gray-200 bg-white"
+              >
+                <p className="text-sm text-gray-700">Sorry, this video summarization failed because of the reason <i>"{video.failed_reason}"</i>. You can delete this summarization attempt below.</p>
+                <div className="flex justify-end">
+                  <DeleteVideoForm videoId={video.id} />
+                </div>
+              </div>
+            );
+          }
+
           return (
             <div
               key={video.id}
@@ -237,20 +251,7 @@ export default function Dashboard() {
                     />
                   )}
 
-                  <Form action="/delete-video" method="post" className="inline-flex">
-                    <input type="hidden" name="video_id" value={video.id} />
-                    <button
-                      type="submit"
-                      className="text-red-700 text-xs inline-flex items-center gap-x-1 hover:underline"
-                    >
-                      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="w-4 h-4">
-                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6.75 7.75L7.59115 17.4233C7.68102 18.4568 8.54622 19.25 9.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75" />
-                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.75 7.5V6.75C9.75 5.64543 10.6454 4.75 11.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.5" />
-                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 7.75H19" />
-                      </svg>
-                      Delete
-                    </button>
-                  </Form>
+                  <DeleteVideoForm videoId={video.id} />
                 </div>
               </div>
             </div>
